@@ -19,18 +19,32 @@ export const metadata: Metadata = {
   description: "Minimal journaling app.",
 };
 
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-xl mx-auto `}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <header className="flex justify-end p-4">
+            <ThemeToggle />
+          </header>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+
