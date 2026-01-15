@@ -63,6 +63,15 @@ export class LocalStorageAdapter implements JournalStorage {
     }
   }
 
+  async deleteDay(date: string): Promise<void> {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const key = getStorageKey(date);
+    localStorage.removeItem(key);
+  }
+
   async getDay(date: string): Promise<JournalDay | null> {
     const entries = await this.getEntries(date);
 
@@ -88,7 +97,7 @@ export class LocalStorageAdapter implements JournalStorage {
       if (key && key.startsWith(STORAGE_PREFIX)) {
         const date = key.replace(STORAGE_PREFIX, "");
         const entries = await this.getEntries(date);
-        
+
         if (entries.length > 0) {
           days.push({
             date,

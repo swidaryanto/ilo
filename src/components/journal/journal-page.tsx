@@ -5,6 +5,7 @@ import { useJournal } from "@/hooks/use-journal";
 import { HourSection } from "./hour-section";
 import { formatDate, formatDateDisplay } from "@/lib/utils/date";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 
 export function JournalPage() {
@@ -35,7 +36,7 @@ export function JournalPage() {
     setHoveredHour(null);
   };
 
-  const handleHourBlur = () => {};
+  const handleHourBlur = () => { };
 
   const handleHourHover = (hour: number) => {
     if (focusedHour !== hour) {
@@ -72,16 +73,21 @@ export function JournalPage() {
 
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto overflow-hidden">
-      <div className="shrink-0 pt-6 pb-12">
-        <div className="flex items-center justify-between px-6">
-          <h1 className="text-2xl font-semibold">
-            {formatDateDisplay(currentDate)}
-          </h1>
+      <div className="shrink-0 pt-6 pb-8 md:pb-12 mt-8">
+        <div className="flex flex-col px-6 gap-2">
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg md:text-2xl font-semibold tracking-tight">
+              {formatDateDisplay(currentDate)}
+            </h1>
+            <div className="md:hidden">
+              <ThemeToggle />
+            </div>
+          </div>
           <Link
             href="/notes"
-            className="text-sm text-muted-foreground hover:text-foreground"
+            className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            View Notes
+            Back to Notes
           </Link>
         </div>
       </div>
