@@ -93,7 +93,7 @@ export function HourSection({
             }
           }}
           placeholder={shouldShowPlaceholder ? "What's on your mind?" : ""}
-          className="border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-0 px-0 bg-transparent resize-none min-h-9"
+          className="border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-0 px-2 bg-transparent resize-none min-h-9"
           rows={1}
         />
       </div>

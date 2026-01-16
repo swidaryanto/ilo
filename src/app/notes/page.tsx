@@ -94,7 +94,7 @@ export default function NotesPage() {
               href="/"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Back to Journal
+              Resume Journal
             </Link>
           </div>
         </div>

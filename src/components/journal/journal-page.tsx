@@ -75,20 +75,22 @@ export function JournalPage() {
     <div className="flex flex-col h-screen max-w-4xl mx-auto overflow-hidden">
       <div className="shrink-0 pt-6 pb-8 md:pb-12 mt-8">
         <div className="flex flex-col px-6 gap-2">
-          <div className="flex items-center justify-between">
-            <h1 className="text-lg md:text-2xl font-semibold tracking-tight">
-              {formatDateDisplay(currentDate)}
-            </h1>
-            <div className="md:hidden">
+          <div className="flex items-start justify-between">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-lg md:text-2xl font-semibold tracking-tight leading-tight">
+                {formatDateDisplay(currentDate)}
+              </h1>
+              <Link
+                href="/notes"
+                className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Back to Notes
+              </Link>
+            </div>
+            <div className="md:hidden mt-1">
               <ThemeToggle />
             </div>
           </div>
-          <Link
-            href="/notes"
-            className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Back to Notes
-          </Link>
         </div>
       </div>
 

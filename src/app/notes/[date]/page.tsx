@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useJournal } from "@/hooks/use-journal";
 import { HourSection } from "@/components/journal/hour-section";
-import { formatDateDisplay } from "@/lib/utils/date";
+import { formatDate, formatDateDisplay } from "@/lib/utils/date";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -20,18 +20,25 @@ export default function DateNotesPage() {
   const [focusedHour, setFocusedHour] = useState<number | null>(null);
   const [hoveredHour, setHoveredHour] = useState<number | null>(null);
 
+  const isToday = date === formatDate(new Date());
+
   useEffect(() => {
     if (!loading) {
-      setFocusedHour(0);
+      if (isToday) {
+        const currentHour = new Date().getHours();
+        setFocusedHour(currentHour);
+      } else {
+        setFocusedHour(0);
+      }
     }
-  }, [loading]);
+  }, [loading, isToday]);
 
   const handleHourFocus = (hour: number) => {
     setFocusedHour(hour);
     setHoveredHour(null);
   };
 
-  const handleHourBlur = () => {};
+  const handleHourBlur = () => { };
 
   const handleHourHover = (hour: number) => {
     if (focusedHour !== hour) {
@@ -68,13 +75,13 @@ export default function DateNotesPage() {
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto overflow-hidden">
       <div className="shrink-0 py-12">
-        <div className="flex items-center justify-between px-6">
-          <h1 className="text-2xl font-semibold">
+        <div className="flex flex-col px-6 gap-1">
+          <h1 className="text-2xl font-semibold tracking-tight leading-tight">
             {formatDateDisplay(date)}
           </h1>
           <Link
             href="/notes"
-            className="text-sm text-muted-foreground hover:text-foreground"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             Back to Notes
           </Link>
