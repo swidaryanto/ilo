@@ -76,7 +76,7 @@ export default function NotesPage() {
 
   // Calendar View Component
   const CalendarView = () => (
-    <div className="flex flex-col items-center justify-between flex-1 py-12 w-full max-w-full">
+    <div className="flex flex-col items-center justify-between flex-1 py-3 w-full max-w-full">
       <div className="grid grid-cols-7 sm:grid-cols-9 md:grid-cols-11 lg:grid-cols-13 gap-4 md:gap-6 w-full px-6 place-items-center">
         {Array.from({ length: daysInMonth }, (_, i) => {
           const dayNum = i + 1;
@@ -102,7 +102,7 @@ export default function NotesPage() {
         })}
       </div>
 
-      <div className="mt-16 text-center">
+      <div className="mt-8 text-center">
         <div className="text-sm font-medium text-orange-500/80">
           {daysLeftInMonth}d left
         </div>
@@ -126,7 +126,8 @@ export default function NotesPage() {
           </div>
 
           {/* Mode Selection Toggle */}
-          <div className="flex justify-end mt-6">
+          {/* Mode Selection Toggle */}
+          <div className="flex items-center gap-4 mt-3">
             <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl ring-1 ring-border/50">
               <Button
                 variant="ghost"
@@ -151,11 +152,16 @@ export default function NotesPage() {
                 <IconLayoutGrid stroke={1.5} className="h-5 w-5" />
               </Button>
             </div>
+            {viewMode === 'calendar' && (
+              <p className="text-[11px] text-muted-foreground/45 tracking-wide italic">
+                Orange dots mark days with captured notes
+              </p>
+            )}
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="flex-1 min-h-0 flex flex-col mt-4">
+        <div className="flex-1 min-h-0 flex flex-col mt-3">
           {viewMode === 'list' ? (
             days.length === 0 ? (
               <div className="flex-1 flex items-center justify-center px-6">
