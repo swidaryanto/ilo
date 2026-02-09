@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { LocalStorageAdapter } from "@/lib/storage/local-storage-adapter";
 import type { JournalDay } from "@/lib/types/journal";
-import { formatDate, formatDateDisplay } from "@/lib/utils/date";
+import { formatDate, formatDateDisplay, formatDateShortDisplay } from "@/lib/utils/date";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { IconTrash, IconList, IconLayoutGrid } from "@tabler/icons-react";
@@ -29,6 +29,8 @@ export default function NotesPage() {
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const daysLeftInMonth = daysInMonth - today.getDate();
   const percentLeft = Math.round((daysLeftInMonth / daysInMonth) * 100);
+  const currentDateDisplay = formatDateShortDisplay(formatDate(today));
+  const daysLeftLabel = `${currentDateDisplay} • ${daysLeftInMonth}d left`;
 
   const loadAllDays = async () => {
     setLoading(true);
@@ -76,8 +78,8 @@ export default function NotesPage() {
 
   // Calendar View Component
   const CalendarView = () => (
-    <div className="flex flex-col items-center justify-between flex-1 py-3 w-full max-w-full">
-      <div className="grid grid-cols-7 sm:grid-cols-9 md:grid-cols-11 lg:grid-cols-13 gap-4 md:gap-6 w-full px-6 place-items-center">
+    <div className="flex flex-col items-center flex-1 py-3 w-full max-w-full">
+      <div className="grid grid-cols-7 sm:grid-cols-9 md:grid-cols-11 lg:grid-cols-13 gap-x-4 gap-y-6 md:gap-6 w-full px-6 place-items-center">
         {Array.from({ length: daysInMonth }, (_, i) => {
           const dayNum = i + 1;
           const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
@@ -94,18 +96,15 @@ export default function NotesPage() {
                 } ${isToday ? "ring-2 ring-orange-500/40 ring-offset-2" : ""}`}
               title={hasEntry ? `Note for ${formatDateDisplay(dateStr)}` : undefined}
             >
+              {isToday && (
+                <span className="absolute inset-[-4px] rounded-full bg-orange-500/20 animate-ping [animation-duration:2.5s]" />
+              )}
               {hasEntry && (
                 <span className="absolute inset-0 rounded-full animate-pulse bg-orange-500/20 group-hover:block hidden" />
               )}
             </button>
           );
         })}
-      </div>
-
-      <div className="mt-8 text-center">
-        <div className="text-sm font-medium text-orange-500/80">
-          {daysLeftInMonth}d left
-        </div>
       </div>
     </div>
   );
@@ -161,52 +160,59 @@ export default function NotesPage() {
         </div>
 
         {/* Content Section */}
-        <div className="flex-1 min-h-0 flex flex-col mt-3">
-          {viewMode === 'list' ? (
-            days.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center px-6">
-                <div className="text-center text-muted-foreground">
-                  <p className="text-lg">No notes yet</p>
-                  <p className="text-sm mt-2">Start writing in your journal to see notes here</p>
+        <div className="flex-1 min-h-0 flex flex-col mt-3 pb-6 md:pb-8">
+          <div className="flex-1 min-h-0">
+            {viewMode === 'list' ? (
+              days.length === 0 ? (
+                <div className="flex-1 flex items-center justify-center px-6">
+                  <div className="text-center text-muted-foreground">
+                    <p className="text-lg">No notes yet</p>
+                    <p className="text-sm mt-2">Start writing in your journal to see notes here</p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <ScrollArea className="flex-1">
-                <div className="flex flex-col gap-1 px-6 pb-12">
-                  {days.map((day) => {
-                    const isToday = day.date === formatDate(new Date());
-                    return (
-                      <div key={day.date} className="group flex items-center justify-between py-1 px-2 -mx-2 rounded-lg hover:bg-accent/35 transition-all">
-                        <Link
-                          href={`/notes/${day.date}`}
-                          className="flex-1 text-xl font-semibold hover:text-muted-foreground transition-colors py-2"
-                        >
-                          {formatDateDisplay(day.date)}
-                        </Link>
-                        {isToday ? (
-                          <span className="text-sm font-medium text-muted-foreground/40 px-3 select-none">
-                            Today
-                          </span>
-                        ) : (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={(e) => handleDeleteClick(e, day.date)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              ) : (
+                <ScrollArea className="flex-1">
+                  <div className="flex flex-col gap-1 px-6 pb-12">
+                    {days.map((day) => {
+                      const isToday = day.date === formatDate(new Date());
+                      return (
+                        <div key={day.date} className="group flex items-center justify-between py-1 px-2 -mx-2 rounded-lg hover:bg-accent/35 transition-all">
+                          <Link
+                            href={`/notes/${day.date}`}
+                            className="flex-1 text-xl font-semibold hover:text-muted-foreground transition-colors py-2"
                           >
-                            <IconTrash stroke={1.5} className="h-5 w-5" />
-                            <span className="sr-only">Delete</span>
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-            )
-          ) : (
-            <CalendarView />
-          )}
+                            {formatDateDisplay(day.date)}
+                          </Link>
+                          {isToday ? (
+                            <span className="text-sm font-medium text-muted-foreground/40 px-3 select-none">
+                              Today
+                            </span>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => handleDeleteClick(e, day.date)}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <IconTrash stroke={1.5} className="h-5 w-5" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+              )
+            ) : (
+              <CalendarView />
+            )}
+          </div>
+          <div className="mt-6 text-center">
+            <div className="text-sm font-medium text-orange-500/80">
+              {daysLeftLabel}
+            </div>
+          </div>
         </div>
       </div>
 
