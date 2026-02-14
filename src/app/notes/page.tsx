@@ -74,11 +74,8 @@ export default function NotesPage() {
     loadAllDays();
   }, []);
 
-  // Swipe hint — show once per user, animated via direct DOM manipulation
+  // Swipe hint — show on every page load, animated via direct DOM manipulation
   useEffect(() => {
-    const key = 'ilo:swipe-hint-shown';
-    if (localStorage.getItem(key)) return;
-
     const link = linkRef.current;
     const hint = hintRef.current;
     if (!link || !hint) return;
@@ -91,13 +88,12 @@ export default function NotesPage() {
       hint.style.transform = 'translateY(0)';
     }, 1500);
 
-    // Phase 2: after 4.5s, crossfade back and mark as shown
+    // Phase 2: after 4.5s, crossfade back
     const t2 = setTimeout(() => {
       link.style.opacity = '1';
       link.style.transform = 'translateY(0)';
       hint.style.opacity = '0';
       hint.style.transform = 'translateY(8px)';
-      localStorage.setItem(key, '1');
     }, 4500);
 
     return () => { clearTimeout(t1); clearTimeout(t2); };
@@ -302,7 +298,7 @@ export default function NotesPage() {
         {/* Header Section */}
         <div className="shrink-0 pt-12 pb-4 px-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold tracking-tight">Notes</h1>
+            <h1 className="text-[20px] md:text-[25px] font-normal italic tracking-tight font-[family-name:var(--font-instrument-serif)]">Ilo Journal</h1>
             <div className="relative">
               <Link
                 ref={linkRef}
@@ -317,7 +313,8 @@ export default function NotesPage() {
                 className="absolute top-0 right-0 h-full text-xs text-muted-foreground/60 italic font-medium flex items-center pointer-events-none whitespace-nowrap"
                 style={{ opacity: 0, transform: 'translateY(8px)', transition: 'opacity 0.5s ease, transform 0.5s ease' }}
               >
-                Swipe left to delete
+                <span className="md:hidden">Swipe left to delete</span>
+                <span className="hidden md:inline">Hover the date to delete</span>
               </span>
             </div>
           </div>
@@ -370,7 +367,7 @@ export default function NotesPage() {
                 </div>
               ) : (
                 <ScrollArea className="flex-1">
-                  <div className="flex flex-col px-6 pb-12">
+                  <div className="flex flex-col gap-2 md:gap-0 px-6 pb-12">
                     {days.map((day) => {
                       const isToday = day.date === formatDate(new Date());
 
@@ -416,7 +413,7 @@ export default function NotesPage() {
                           >
                             <Link
                               href={`/notes/${day.date}`}
-                              className="flex-1 text-xl font-semibold hover:text-muted-foreground transition-colors py-2"
+                              className="flex-1 text-sm md:text-xl font-semibold hover:text-muted-foreground transition-colors py-2"
                               onClick={(e) => {
                                 if (openSwipeDate.current === day.date) {
                                   e.preventDefault();
