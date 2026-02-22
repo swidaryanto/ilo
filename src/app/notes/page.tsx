@@ -289,6 +289,10 @@ export default function NotesPage() {
           );
         })}
       </div>
+      {/* Helper text below the grid */}
+      <p className="text-[11px] text-muted-foreground/45 tracking-wide italic mt-6 text-center">
+        Orange dots mark days with captured notes
+      </p>
     </div>
   );
 
@@ -299,30 +303,9 @@ export default function NotesPage() {
         <div className="shrink-0 pt-12 pb-4 px-6">
           <div className="flex items-center justify-between">
             <h1 className="text-[20px] md:text-[25px] font-normal italic tracking-tight font-[family-name:var(--font-instrument-serif)]">Ilo Journal</h1>
-            <div className="relative">
-              <Link
-                ref={linkRef}
-                href="/"
-                className="text-sm text-muted-foreground hover:text-foreground font-medium block"
-                style={{ transition: 'opacity 0.5s ease, transform 0.5s ease' }}
-              >
-                Resume Journal
-              </Link>
-              <span
-                ref={hintRef}
-                className="absolute top-0 right-0 h-full text-xs text-muted-foreground/60 italic font-medium flex items-center pointer-events-none whitespace-nowrap"
-                style={{ opacity: 0, transform: 'translateY(8px)', transition: 'opacity 0.5s ease, transform 0.5s ease' }}
-              >
-                <span className="md:hidden">Swipe left to delete</span>
-                <span className="hidden md:inline">Hover the date to delete</span>
-              </span>
-            </div>
-          </div>
 
-          {/* Mode Selection Toggle */}
-          {/* Mode Selection Toggle */}
-          <div className="flex items-center gap-4 mt-3">
-            <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl ring-1 ring-border/50">
+            {/* Mode Selection Toggle moved to header */}
+            <div className="flex items-center gap-1 bg-muted/20 p-1 rounded-xl ring-1 ring-border/30">
               <Button
                 variant="ghost"
                 size="icon"
@@ -346,16 +329,12 @@ export default function NotesPage() {
                 <IconLayoutGrid stroke={1.5} className="h-5 w-5" />
               </Button>
             </div>
-            {viewMode === 'calendar' && (
-              <p className="text-[11px] text-muted-foreground/45 tracking-wide italic">
-                Orange dots mark days with captured notes
-              </p>
-            )}
           </div>
+
         </div>
 
         {/* Content Section */}
-        <div className="flex-1 min-h-0 flex flex-col mt-3 pb-6 md:pb-8">
+        <div className="flex-1 min-h-0 flex flex-col mt-3 pb-[140px]"> {/* Added padding at bottom to clear the fixed footer */}
           <div className="flex-1 min-h-0">
             {viewMode === 'list' ? (
               days.length === 0 ? (
@@ -367,7 +346,7 @@ export default function NotesPage() {
                 </div>
               ) : (
                 <ScrollArea className="flex-1">
-                  <div className="flex flex-col gap-2 md:gap-0 px-6 pb-12">
+                  <div className="flex flex-col gap-2 md:gap-0 px-6 pb-6">
                     {days.map((day) => {
                       const isToday = day.date === formatDate(new Date());
 
@@ -449,10 +428,27 @@ export default function NotesPage() {
               <CalendarView />
             )}
           </div>
-          <div className="mt-6 text-center">
-            <div className="text-sm font-medium text-orange-500/80">
-              {daysLeftLabel}
+        </div>
+
+        {/* Fixed Bottom Footer */}
+        <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md pt-4 pb-8 px-6 flex flex-col items-center z-10 mx-auto max-w-4xl border-t border-transparent">
+          <Link
+            href="/"
+            className="w-full"
+          >
+            <div
+              className="flex justify-center items-center w-full text-foreground bg-background border border-[#E8E8E8] dark:border-border hover:bg-muted/50 transition-colors font-medium text-[15px] shadow-[0_2px_4px_0_rgba(0,0,0,0.05)] dark:shadow-none"
+              style={{
+                padding: '14px 8px',
+                gap: '8px',
+                borderRadius: '8px',
+              }}
+            >
+              Resume Journal
             </div>
+          </Link>
+          <div className="mt-4 text-[11px] font-medium text-[#C0C0C0] dark:text-muted-foreground">
+            Current date: {currentDateDisplay}
           </div>
         </div>
       </div>
