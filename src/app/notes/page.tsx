@@ -434,10 +434,10 @@ export default function NotesPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md pt-4 pb-8 px-6 flex flex-col items-center z-10 mx-auto max-w-4xl border-t border-transparent">
           <Link
             href="/"
-            className="w-full"
+            className="w-full md:max-w-[492px]"
           >
             <div
-              className="flex justify-center items-center w-full text-foreground bg-background border border-[#E8E8E8] dark:border-border hover:bg-muted/50 transition-colors font-medium text-[15px] shadow-[0_2px_4px_0_rgba(0,0,0,0.05)] dark:shadow-none"
+              className="flex justify-center items-center w-full text-foreground bg-background border border-[#E8E8E8] dark:border-border hover:bg-muted/50 active:bg-muted/60 transition-colors transition-transform font-medium text-[15px] shadow-[0_2px_4px_0_rgba(0,0,0,0.05)] active:shadow-none active:translate-y-[1px] dark:shadow-none"
               style={{
                 padding: '14px 8px',
                 gap: '8px',
