@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import type { JournalEntry, JournalDay } from "@/lib/types/journal";
+import type { JournalEntry } from "@/lib/types/journal";
 import { LocalStorageAdapter } from "@/lib/storage/local-storage-adapter";
 import type { JournalStorage } from "@/lib/storage/journal-storage";
 import { formatDate } from "@/lib/utils/date";
@@ -13,7 +13,7 @@ function generateEntryId(date: string, hour: number): string {
 }
 
 export function useJournal(initialDate?: string) {
-  const [selectedDate, setSelectedDate] = useState<string>(
+  const [selectedDate] = useState<string>(
     initialDate || formatDate(new Date())
   );
   const [entries, setEntries] = useState<JournalEntry[]>([]);

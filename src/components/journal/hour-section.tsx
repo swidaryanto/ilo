@@ -6,6 +6,7 @@ import { formatHour } from "@/lib/utils/date";
 import type { JournalEntry } from "@/lib/types/journal";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { StreakBadge } from "@/components/streak-badge";
 
 interface HourSectionProps {
   hour: number;
@@ -18,6 +19,10 @@ interface HourSectionProps {
   onBlur?: () => void;
   onNavigateUp?: () => void;
   onNavigateDown?: () => void;
+  showStreakBadge?: boolean;
+  streakCount?: number;
+  onStreakAnimationComplete?: () => void;
+  onNewEntry?: (hour: number) => void;
 }
 
 export function HourSection({
@@ -31,11 +36,20 @@ export function HourSection({
   onBlur,
   onNavigateUp,
   onNavigateDown,
+  showStreakBadge = false,
+  streakCount = 0,
+  onStreakAnimationComplete,
+  onNewEntry,
 }: HourSectionProps) {
   const { content, handleChange, handleBlur, isSaving } = useHourNotes({
     hour,
     entry,
     onSave,
+    onNewEntry: () => {
+      if (onNewEntry) {
+        onNewEntry(hour);
+      }
+    }
   });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -61,13 +75,18 @@ export function HourSection({
         isBlurred && "opacity-30 blur-md"
       )}
     >
-      <div className="flex flex-col gap-2 min-w-[60px] items-start justify-center">
+      <div className="flex flex-col gap-2 min-w-[60px] items-start justify-center relative">
         <span className="text-sm font-medium text-muted-foreground">
           {formatHour(hour)}
         </span>
         {isSaving && (
           <span className="text-xs text-muted-foreground">Saving...</span>
         )}
+        <StreakBadge
+          streak={streakCount}
+          show={showStreakBadge}
+          onAnimationComplete={onStreakAnimationComplete}
+        />
       </div>
       <div className="flex-1">
         <Textarea
