@@ -1,22 +1,31 @@
 # Ilo
 
-Time-based journal app. Write notes organized by hour of the day. Auto-saves as you type.
+A time-based journal for people who think in hours, not pages.
 
-## Architecture
+Ilo organizes your notes by the hour of the day — so instead of scrolling through
+a wall of text, you can find exactly what you were thinking at 9am, 3pm, or midnight.
+No setup. No accounts. Just open it and start writing.
 
-- Entries stored by date and hour (0-23) in localStorage
-- Storage adapter pattern separates interface from implementation (ready for database migration)
-- Auto-save with 500ms debounce on content change
-- Focus/blur system: only current hour is clear, others are blurred
-- Textarea-based editing with native multi-line support
-- Arrow key navigation between hours when at text boundaries
-- Modular structure: storage interface, hooks, and components are separated
-- Data structure maps directly to database schema (date, hour, content, timestamps)
+## What it does
 
-## Future
+- **Write by the hour** — each hour of the day has its own space
+- **Auto-saves as you type** — nothing to click, nothing to lose
+- **Stays focused** — only the current hour is in full view; past and future hours are softened so you can concentrate on now
+- **Keyboard-friendly** — navigate between hours with arrow keys without lifting your hands
 
-- Database migration (PostgreSQL/SQLite)
-- Search and filtering
-- Export functionality
-- Tags and categories
-- Rich text support
+## How it's built
+
+| Layer | Approach |
+|---|---|
+| Storage | localStorage with a clean adapter pattern — ready to swap in a real database |
+| Auto-save | 500ms debounce on content change |
+| Data shape | Maps directly to a future database schema (date, hour, content, timestamps) |
+| Structure | Storage interface, hooks, and components are kept separate |
+
+## What's next
+
+- [ ] Database migration (PostgreSQL / SQLite)
+- [ ] Search and filtering across entries
+- [ ] Export to text or markdown
+- [ ] Tags and categories
+- [ ] Rich text support
