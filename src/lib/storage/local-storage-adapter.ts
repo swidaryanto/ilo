@@ -7,10 +7,44 @@ function getStorageKey(date: string): string {
   return `${STORAGE_PREFIX}${date}`;
 }
 
+/**
+ * Checks if localStorage is available and writable.
+ * Returns false in private browsing modes or when storage is disabled.
+ */
+function isLocalStorageAvailable(): boolean {
+  if (typeof window === "undefined") return false;
+  
+  try {
+    const testKey = "__storage_test__";
+    localStorage.setItem(testKey, testKey);
+    localStorage.removeItem(testKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Checks if localStorage has exceeded quota.
+ */
+function isLocalStorageQuotaExceeded(error: unknown): boolean {
+  if (error instanceof DOMException) {
+    return error.name === "QuotaExceededError";
+  }
+  if (error instanceof Error) {
+    return error.message.includes("quota") || error.message.includes("exceeded");
+  }
+  return false;
+}
+
 export class LocalStorageAdapter implements JournalStorage {
   async getEntries(date: string): Promise<JournalEntry[]> {
     if (typeof window === "undefined") {
       return [];
+    }
+
+    if (!isLocalStorageAvailable()) {
+      throw new Error("LocalStorage is not available. Your data cannot be loaded.");
     }
 
     const key = getStorageKey(date);
@@ -30,7 +64,11 @@ export class LocalStorageAdapter implements JournalStorage {
 
   async saveEntry(entry: JournalEntry): Promise<void> {
     if (typeof window === "undefined") {
-      return;
+      throw new Error("Cannot save: not running in browser");
+    }
+
+    if (!isLocalStorageAvailable()) {
+      throw new Error("LocalStorage is not available. Your entries cannot be saved.");
     }
 
     const key = getStorageKey(entry.date);
@@ -44,7 +82,14 @@ export class LocalStorageAdapter implements JournalStorage {
       existingEntries.push(entry);
     }
 
-    localStorage.setItem(key, JSON.stringify(existingEntries));
+    try {
+      localStorage.setItem(key, JSON.stringify(existingEntries));
+    } catch (error) {
+      if (isLocalStorageQuotaExceeded(error)) {
+        throw new Error("Storage quota exceeded. Please delete some entries to free up space.");
+      }
+      throw new Error("Failed to save entry. Please check your browser settings.");
+    }
   }
 
   async deleteEntry(id: string, date: string): Promise<void> {
@@ -87,6 +132,10 @@ export class LocalStorageAdapter implements JournalStorage {
 
   async getAllDays(): Promise<JournalDay[]> {
     if (typeof window === "undefined") {
+      return [];
+    }
+
+    if (!isLocalStorageAvailable()) {
       return [];
     }
 

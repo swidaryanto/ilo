@@ -44,3 +44,6 @@ next-env.d.ts
 .vscode/
 .cursor/
 
+
+.qwen/
+gha-creds-*.json

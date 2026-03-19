@@ -7,14 +7,18 @@ import { HourSection } from "./hour-section";
 import { formatDate, formatDateDisplay } from "@/lib/utils/date";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useToast } from "@/components/ui/toast";
 import Link from "next/link";
 
 export function JournalPage() {
   const currentDate = formatDate(new Date());
+  const { addToast } = useToast();
   const {
     loading,
     saveEntry,
     getEntryForHour,
+    saveError,
+    clearSaveError,
   } = useJournal(currentDate);
 
   const {
@@ -29,6 +33,14 @@ export function JournalPage() {
   const [hoveredHour, setHoveredHour] = useState<number | null>(null);
   const [showStreakBadge, setShowStreakBadge] = useState(false);
   const [streakHour, setStreakHour] = useState<number | null>(null);
+
+  // Show toast when save error occurs
+  useEffect(() => {
+    if (saveError) {
+      addToast(saveError.message, "error", 5000);
+      clearSaveError();
+    }
+  }, [saveError, addToast, clearSaveError]);
 
   useEffect(() => {
     if (!loading && streakLoaded) {
@@ -133,6 +145,7 @@ export function JournalPage() {
                   hour={hour}
                   entry={entry}
                   onSave={saveEntry}
+                  onError={(message) => addToast(message, "error", 5000)}
                   isCurrentHour={isCurrentHour}
                   isFocused={isFocused}
                   isHovered={isHovered}

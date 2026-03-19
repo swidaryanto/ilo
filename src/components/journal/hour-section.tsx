@@ -7,11 +7,13 @@ import type { JournalEntry } from "@/lib/types/journal";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { StreakBadge } from "@/components/streak-badge";
+import { IconAlertCircle } from "@tabler/icons-react";
 
 interface HourSectionProps {
   hour: number;
   entry: JournalEntry | undefined;
-  onSave: (hour: number, content: string) => Promise<void>;
+  onSave: (hour: number, content: string) => Promise<boolean>;
+  onError?: (error: string) => void;
   isCurrentHour?: boolean;
   isFocused?: boolean;
   isHovered?: boolean;
@@ -29,6 +31,7 @@ export function HourSection({
   hour,
   entry,
   onSave,
+  onError,
   isCurrentHour = false,
   isFocused = false,
   isHovered = false,
@@ -41,10 +44,11 @@ export function HourSection({
   onStreakAnimationComplete,
   onNewEntry,
 }: HourSectionProps) {
-  const { content, handleChange, handleBlur, isSaving } = useHourNotes({
+  const { content, handleChange, handleBlur, isSaving, saveFailed } = useHourNotes({
     hour,
     entry,
     onSave,
+    onError,
     onNewEntry: () => {
       if (onNewEntry) {
         onNewEntry(hour);
@@ -82,6 +86,12 @@ export function HourSection({
         {isSaving && (
           <span className="text-xs text-muted-foreground">Saving...</span>
         )}
+        {saveFailed && (
+          <span className="text-xs text-red-500 flex items-center gap-1">
+            <IconAlertCircle className="h-3 w-3" />
+            Save failed
+          </span>
+        )}
         <StreakBadge
           streak={streakCount}
           show={showStreakBadge}
@@ -115,7 +125,10 @@ export function HourSection({
             }
           }}
           placeholder={shouldShowPlaceholder ? "What's on your mind?" : ""}
-          className="border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-0 px-2 bg-transparent resize-none min-h-9"
+          className={cn(
+            "border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-0 px-2 bg-transparent resize-none min-h-9",
+            saveFailed && "text-red-600 dark:text-red-400"
+          )}
           rows={1}
         />
       </div>

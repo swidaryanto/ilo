@@ -6,8 +6,10 @@ import type { JournalDay } from "@/lib/types/journal";
 import { formatDate, formatDateDisplay, formatDateShortDisplay } from "@/lib/utils/date";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { IconTrash, IconList, IconLayoutGrid } from "@tabler/icons-react";
+import { IconTrash, IconList, IconLayoutGrid, IconDotsVertical, IconSun, IconMoon, IconInfoCircle } from "@tabler/icons-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
@@ -22,6 +24,8 @@ const storage = new LocalStorageAdapter();
 
 export default function NotesPage() {
   const router = useRouter();
+  const { setTheme, theme } = useTheme();
+  const isDark = theme === "dark";
   const [days, setDays] = useState<JournalDay[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -304,30 +308,72 @@ export default function NotesPage() {
           <div className="flex items-center justify-between">
             <h1 className="text-[20px] md:text-[25px] font-normal italic tracking-tight font-[family-name:var(--font-instrument-serif)]">Ilo Journal</h1>
 
-            {/* Mode Selection Toggle moved to header */}
-            <div className="flex items-center gap-1 bg-muted/20 p-1 rounded-xl ring-1 ring-border/30">
-              <Button
-                variant="ghost"
-                size="icon"
-                className={`h-9 w-9 rounded-lg transition-all ${viewMode === 'list'
-                  ? 'bg-background shadow-sm text-foreground ring-1 ring-border/20'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
-                  }`}
-                onClick={() => setViewMode('list')}
-              >
-                <IconList stroke={1.5} className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={`h-9 w-9 rounded-lg transition-all ${viewMode === 'calendar'
-                  ? 'bg-background shadow-sm text-foreground ring-1 ring-border/20'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
-                  }`}
-                onClick={() => setViewMode('calendar')}
-              >
-                <IconLayoutGrid stroke={1.5} className="h-5 w-5" />
-              </Button>
+            <div className="flex items-center gap-2">
+              {/* Mode Selection Toggle */}
+              <div className="flex items-center gap-1 bg-muted/20 p-1 rounded-xl ring-1 ring-border/30">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`h-9 w-9 rounded-lg transition-all ${viewMode === 'list'
+                    ? 'bg-background shadow-sm text-foreground ring-1 ring-border/20'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
+                    }`}
+                  onClick={() => setViewMode('list')}
+                >
+                  <IconList stroke={1.5} className="h-5 w-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`h-9 w-9 rounded-lg transition-all ${viewMode === 'calendar'
+                    ? 'bg-background shadow-sm text-foreground ring-1 ring-border/20'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
+                    }`}
+                  onClick={() => setViewMode('calendar')}
+                >
+                  <IconLayoutGrid stroke={1.5} className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Settings Menu - Mobile only */}
+              <div className="md:hidden">
+                <Popover>
+                  <PopoverTrigger>
+                    <div className="flex items-center justify-center h-9 w-9 rounded-lg hover:bg-accent/50 cursor-pointer">
+                      <IconDotsVertical className="h-5 w-5" />
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-44 p-1 rounded-lg">
+                    <div className="flex flex-col">
+                      {/* Theme Toggle */}
+                      <button
+                        onClick={() => setTheme(isDark ? "light" : "dark")}
+                        className="flex items-center gap-2 w-full px-2.5 py-2 rounded-md hover:bg-accent/50 transition-colors text-left"
+                      >
+                        {isDark ? (
+                          <IconSun className="h-4 w-4" />
+                        ) : (
+                          <IconMoon className="h-4 w-4" />
+                        )}
+                        <span className="text-sm">
+                          {isDark ? "Light theme" : "Dark theme"}
+                        </span>
+                      </button>
+
+                      {/* Divider */}
+                      <div className="h-px bg-border mx-2 my-0.5" />
+
+                      {/* Info */}
+                      <div className="px-2.5 py-1.5">
+                        <div className="flex items-start gap-2 text-muted-foreground">
+                          <IconInfoCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                          <span className="text-xs leading-relaxed">Entries save automatically as you type</span>
+                        </div>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </div>
 
@@ -431,24 +477,21 @@ export default function NotesPage() {
         </div>
 
         {/* Fixed Bottom Footer */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md pt-4 pb-8 px-6 flex flex-col items-center z-10 mx-auto max-w-4xl border-t border-transparent">
-          <Link
-            href="/"
-            className="w-full md:max-w-[492px]"
-          >
-            <div
-              className="flex justify-center items-center w-full text-foreground bg-background border border-[#E8E8E8] dark:border-border hover:bg-muted/50 active:bg-muted/60 transition-colors transition-transform font-medium text-[15px] shadow-[0_2px_4px_0_rgba(0,0,0,0.05)] active:shadow-none active:translate-y-[1px] dark:shadow-none"
-              style={{
-                padding: '14px 8px',
-                gap: '8px',
-                borderRadius: '8px',
-              }}
-            >
-              Resume Journal
+        <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md pt-4 pb-8 px-6 z-10 mx-auto max-w-4xl border-t border-transparent">
+          <div className="flex items-center justify-between w-full md:max-w-[492px] mx-auto">
+            <div className="text-[13px] font-medium text-muted-foreground">
+              {currentDateDisplay}
             </div>
-          </Link>
-          <div className="mt-4 text-[11px] font-medium text-[#C0C0C0] dark:text-muted-foreground">
-            Current date: {currentDateDisplay}
+            <Link href="/">
+              <div
+                className="relative flex justify-center items-center bg-[#1a1a1a] dark:bg-[#2a2a2a] text-white font-medium text-[13px] px-5 py-2.5 rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.35)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] transition-all duration-200 ease-out overflow-hidden group"
+              >
+                {/* Subtle gradient overlay for depth */}
+                <span className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                {/* Jelly bounce animation on press */}
+                <span className="relative z-10">Resume Journal</span>
+              </div>
+            </Link>
           </div>
         </div>
       </div>
