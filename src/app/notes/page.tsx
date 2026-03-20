@@ -10,6 +10,7 @@ import { IconTrash, IconList, IconLayoutGrid, IconDotsVertical, IconSun, IconMoo
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useTheme } from "next-themes";
+import { EmptyState } from "@/components/empty-state";
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
@@ -385,10 +386,7 @@ export default function NotesPage() {
             {viewMode === 'list' ? (
               days.length === 0 ? (
                 <div className="flex-1 flex items-center justify-center px-6">
-                  <div className="text-center text-muted-foreground">
-                    <p className="text-lg">No notes yet</p>
-                    <p className="text-sm mt-2">Start writing in your journal to see notes here</p>
-                  </div>
+                  <EmptyState variant="notes" />
                 </div>
               ) : (
                 <ScrollArea className="flex-1">

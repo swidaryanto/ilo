@@ -8,6 +8,7 @@ import { formatDate, formatDateDisplay } from "@/lib/utils/date";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useToast } from "@/components/ui/toast";
+import { EmptyState } from "@/components/empty-state";
 import Link from "next/link";
 
 export function JournalPage() {
@@ -19,6 +20,7 @@ export function JournalPage() {
     getEntryForHour,
     saveError,
     clearSaveError,
+    entries,
   } = useJournal(currentDate);
 
   const {
@@ -33,6 +35,9 @@ export function JournalPage() {
   const [hoveredHour, setHoveredHour] = useState<number | null>(null);
   const [showStreakBadge, setShowStreakBadge] = useState(false);
   const [streakHour, setStreakHour] = useState<number | null>(null);
+
+  // Check if there are any entries with content
+  const hasEntries = entries.some((e) => e.content.trim().length > 0);
 
   // Show toast when save error occurs
   useEffect(() => {
@@ -127,6 +132,16 @@ export function JournalPage() {
 
       <ScrollArea className="flex-1 min-h-0">
         <div className="flex flex-col gap-2 px-6 pb-6">
+          {/* Empty state banner - shows when no entries yet */}
+          {!hasEntries && (
+            <div className="py-8">
+              <EmptyState
+                variant="journal"
+                onAction={() => setFocusedHour(currentHour)}
+              />
+            </div>
+          )}
+          
           {Array.from({ length: 24 }).map((_, i) => {
             const hour = i;
             const isCurrentHour = hour === currentHour;
