@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import type { JournalEntry } from "@/lib/types/journal";
+import type { JournalEntry, Mood } from "@/lib/types/journal";
 import { LocalStorageAdapter } from "@/lib/storage/local-storage-adapter";
 import type { JournalStorage } from "@/lib/storage/journal-storage";
 import { formatDate } from "@/lib/utils/date";
@@ -50,7 +50,7 @@ export function useJournal(initialDate?: string) {
   }, [selectedDate, loadEntries]);
 
   const saveEntry = useCallback(
-    async (hour: number, content: string): Promise<boolean> => {
+    async (hour: number, content: string, mood?: Mood): Promise<boolean> => {
       const now = new Date().toISOString();
       const entryId = generateEntryId(selectedDate, hour);
 
@@ -61,6 +61,7 @@ export function useJournal(initialDate?: string) {
         date: selectedDate,
         hour,
         content,
+        mood,
         createdAt: existingEntry?.createdAt || now,
         updatedAt: now,
       };

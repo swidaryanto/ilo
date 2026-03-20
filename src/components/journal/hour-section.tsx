@@ -1,18 +1,20 @@
 "use client";
 
+import * as React from "react";
 import { useEffect, useRef } from "react";
 import { useHourNotes } from "@/hooks/use-hour-notes";
 import { formatHour } from "@/lib/utils/date";
-import type { JournalEntry } from "@/lib/types/journal";
+import type { JournalEntry, Mood } from "@/lib/types/journal";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { StreakBadge } from "@/components/streak-badge";
+import { MoodSelector, MoodBadge } from "@/components/mood-selector";
 import { IconAlertCircle } from "@tabler/icons-react";
 
 interface HourSectionProps {
   hour: number;
   entry: JournalEntry | undefined;
-  onSave: (hour: number, content: string) => Promise<boolean>;
+  onSave: (hour: number, content: string, mood?: Mood) => Promise<boolean>;
   onError?: (error: string) => void;
   isCurrentHour?: boolean;
   isFocused?: boolean;
@@ -44,10 +46,18 @@ export function HourSection({
   onStreakAnimationComplete,
   onNewEntry,
 }: HourSectionProps) {
+  const [mood, setMood] = React.useState<Mood | undefined>(entry?.mood);
+  const moodRef = React.useRef(mood);
+
+  // Keep moodRef in sync with mood state
+  React.useEffect(() => {
+    moodRef.current = mood;
+  }, [mood]);
+
   const { content, handleChange, handleBlur, isSaving, saveFailed } = useHourNotes({
     hour,
     entry,
-    onSave,
+    onSave: (h, c) => onSave(h, c, moodRef.current),
     onError,
     onNewEntry: () => {
       if (onNewEntry) {
@@ -55,6 +65,17 @@ export function HourSection({
       }
     }
   });
+
+  // Sync mood with entry prop
+  React.useEffect(() => {
+    setMood(entry?.mood);
+  }, [entry?.mood]);
+
+  const handleMoodChange = (newMood: Mood | undefined) => {
+    setMood(newMood);
+    // Save with new mood
+    onSave(hour, content, newMood);
+  };
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -71,6 +92,7 @@ export function HourSection({
   const isBlurred = !isFocused && !isHovered;
   const hasContent = content && content.trim().length > 0;
   const shouldShowPlaceholder = isCurrentHour && !hasContent;
+  const showMoodSelector = isFocused || hasContent || mood;
 
   return (
     <div
@@ -79,6 +101,7 @@ export function HourSection({
         isBlurred && "opacity-30 blur-md"
       )}
     >
+      {/* Left: Hour label */}
       <div className="flex flex-col gap-2 min-w-[60px] items-start justify-center relative">
         <span className="text-sm font-medium text-muted-foreground">
           {formatHour(hour)}
@@ -98,7 +121,9 @@ export function HourSection({
           onAnimationComplete={onStreakAnimationComplete}
         />
       </div>
-      <div className="flex-1">
+
+      {/* Middle: Input with fixed width */}
+      <div className="flex flex-col relative w-[400px]">
         <Textarea
           ref={textareaRef}
           value={content || ""}
@@ -126,12 +151,23 @@ export function HourSection({
           }}
           placeholder={shouldShowPlaceholder ? "What's on your mind?" : ""}
           className={cn(
-            "border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-0 px-2 bg-transparent resize-none min-h-9",
+            "border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-0 px-2 bg-transparent resize-none min-h-9 w-full",
             saveFailed && "text-red-600 dark:text-red-400"
           )}
           rows={1}
         />
       </div>
+
+      {/* Right: Mood selector */}
+      {showMoodSelector && (
+        <div className="flex items-start pt-1">
+          <MoodSelector
+            selectedMood={mood}
+            onMoodSelect={handleMoodChange}
+            className=""
+          />
+        </div>
+      )}
     </div>
   );
 }

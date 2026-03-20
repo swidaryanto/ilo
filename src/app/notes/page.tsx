@@ -11,6 +11,8 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useTheme } from "next-themes";
 import { EmptyState } from "@/components/empty-state";
+import { MoodBadge } from "@/components/mood-selector";
+import type { Mood } from "@/lib/types/journal";
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
@@ -393,6 +395,8 @@ export default function NotesPage() {
                   <div className="flex flex-col gap-2 md:gap-0 px-6 pb-6">
                     {days.map((day) => {
                       const isToday = day.date === formatDate(new Date());
+                      const dayMoods = day.entries.map(e => e.mood).filter(Boolean) as Mood[];
+                      const uniqueMoods = [...new Set(dayMoods)];
 
                       return (
                         <div
@@ -436,7 +440,7 @@ export default function NotesPage() {
                           >
                             <Link
                               href={`/notes/${day.date}`}
-                              className="flex-1 text-sm md:text-xl font-semibold hover:text-muted-foreground transition-colors py-2"
+                              className="flex-1 flex items-center gap-2 text-sm md:text-xl font-semibold hover:text-muted-foreground transition-colors py-2"
                               onClick={(e) => {
                                 if (openSwipeDate.current === day.date) {
                                   e.preventDefault();
@@ -444,6 +448,13 @@ export default function NotesPage() {
                               }}
                             >
                               {formatDateDisplay(day.date)}
+                              {uniqueMoods.length > 0 && (
+                                <span className="flex items-center gap-1">
+                                  {uniqueMoods.slice(0, 3).map((mood, i) => (
+                                    <MoodBadge key={i} mood={mood} />
+                                  ))}
+                                </span>
+                              )}
                             </Link>
                             {isToday ? (
                               <span className="text-sm font-medium text-muted-foreground/40 px-3 select-none">
