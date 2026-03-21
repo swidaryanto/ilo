@@ -8,7 +8,7 @@ import type { JournalEntry, Mood } from "@/lib/types/journal";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { StreakBadge } from "@/components/streak-badge";
-import { MoodSelector, getMoodEmoji } from "@/components/mood-selector";
+import { MoodSelector } from "@/components/mood-selector";
 import { IconAlertCircle } from "@tabler/icons-react";
 
 interface HourSectionProps {
@@ -93,7 +93,6 @@ export function HourSection({
   const hasContent = content && content.trim().length > 0;
   const shouldShowPlaceholder = isCurrentHour && !hasContent;
   const showMoodSelector = isFocused || hasContent || mood;
-  const moodEmoji = getMoodEmoji(mood);
 
   return (
     <div
@@ -102,18 +101,11 @@ export function HourSection({
         isBlurred && "opacity-30 blur-md"
       )}
     >
-      {/* Left: Hour label with mood emoji */}
+      {/* Left: Hour label */}
       <div className="flex flex-col gap-2 min-w-[60px] items-start justify-center relative">
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-medium text-muted-foreground">
-            {formatHour(hour)}
-          </span>
-          {moodEmoji && (
-            <span className="text-sm" title={mood}>
-              {moodEmoji}
-            </span>
-          )}
-        </div>
+        <span className="text-sm font-medium text-muted-foreground">
+          {formatHour(hour)}
+        </span>
         {isSaving && (
           <span className="text-xs text-muted-foreground">Saving...</span>
         )}
@@ -130,8 +122,8 @@ export function HourSection({
         />
       </div>
 
-      {/* Middle: Input with mood selector below */}
-      <div className="flex-1 flex flex-col">
+      {/* Middle: Input */}
+      <div className="flex-1 flex flex-col md:flex-row md:items-start gap-1 md:gap-3">
         <Textarea
           ref={textareaRef}
           value={content || ""}
@@ -168,7 +160,7 @@ export function HourSection({
           <MoodSelector
             selectedMood={mood}
             onMoodSelect={handleMoodChange}
-            className="mt-2"
+            className="mt-1 md:mt-0 md:shrink-0"
           />
         )}
       </div>
