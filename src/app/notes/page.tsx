@@ -133,8 +133,12 @@ export default function NotesPage() {
     });
 
     // Show toast with undo
+    const entriesWithContent = dayToDelete.entries.filter(e => e.content.trim().length > 0);
+    const entryCount = entriesWithContent.length;
+    const entryWord = entryCount === 1 ? "entry" : "entries";
+    
     addToast({
-      message: `${dayToDelete.entries.length} entry deleted`,
+      message: `${entryCount} ${entryWord} deleted`,
       type: "warning",
       duration: 5000,
       action: {
@@ -540,8 +544,8 @@ export default function NotesPage() {
         </div>
 
         {/* Fixed Bottom Footer */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md pt-4 pb-8 px-6 z-10 mx-auto max-w-4xl border-t border-transparent">
-          <div className="flex items-center justify-between w-full md:max-w-[492px] mx-auto">
+        <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md pt-4 pb-8 z-10 mx-auto max-w-4xl border-t border-transparent">
+          <div className="flex items-center justify-between w-full px-6 md:max-w-[492px] md:mx-auto md:px-0">
             <div className="text-[13px] font-medium text-muted-foreground">
               {currentDateDisplay}
             </div>

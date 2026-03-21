@@ -92,14 +92,14 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
     error: <IconAlertCircle className="h-5 w-5 text-red-500" />,
     success: <IconCheck className="h-5 w-5 text-green-500" />,
     info: <IconAlertCircle className="h-5 w-5 text-blue-500" />,
-    warning: <IconAlertCircle className="h-5 w-5 text-orange-500" />,
+    warning: <IconAlertCircle className="h-5 w-5 text-muted-foreground" />,
   };
 
   const bgColors = {
     error: "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800",
     success: "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800",
     info: "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800",
-    warning: "bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800",
+    warning: "bg-muted/30 dark:bg-muted/20 border-border/50 dark:border-white/10",
   };
 
   return (
@@ -128,7 +128,7 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
             toast.action?.onClick();
             onDismiss();
           }}
-          className="flex items-center gap-1.5 text-xs font-medium text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors self-start"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-background border border-border rounded-md hover:bg-accent hover:border-accent-foreground/20 transition-colors self-start"
         >
           <IconArrowLeft className="h-3.5 w-3.5 rotate-180" />
           {toast.action.label}
