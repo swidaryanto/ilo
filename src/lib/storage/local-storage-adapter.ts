@@ -108,6 +108,24 @@ export class LocalStorageAdapter implements JournalStorage {
     }
   }
 
+  async restoreEntry(entry: JournalEntry): Promise<void> {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const key = getStorageKey(entry.date);
+    const existingEntries = await this.getEntries(entry.date);
+
+    // Check if entry already exists (don't duplicate)
+    const exists = existingEntries.some((e) => e.id === entry.id);
+    if (!exists) {
+      existingEntries.push(entry);
+      // Sort by hour
+      existingEntries.sort((a, b) => a.hour - b.hour);
+      localStorage.setItem(key, JSON.stringify(existingEntries));
+    }
+  }
+
   async deleteDay(date: string): Promise<void> {
     if (typeof window === "undefined") {
       return;

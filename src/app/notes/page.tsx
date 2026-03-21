@@ -12,7 +12,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useTheme } from "next-themes";
 import { EmptyState } from "@/components/empty-state";
 import { MoodBadge } from "@/components/mood-selector";
+import { useToast } from "@/components/ui/toast";
 import type { Mood } from "@/lib/types/journal";
+import type { JournalEntry } from "@/lib/types/journal";
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
@@ -27,6 +29,7 @@ const storage = new LocalStorageAdapter();
 
 export default function NotesPage() {
   const router = useRouter();
+  const { addToast } = useToast();
   const { setTheme, theme } = useTheme();
   const isDark = theme === "dark";
   const [days, setDays] = useState<JournalDay[]>([]);
@@ -34,6 +37,7 @@ export default function NotesPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedDateToDelete, setSelectedDateToDelete] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [pendingDeletion, setPendingDeletion] = useState<{ date: string; entries: JournalEntry[]; timeoutId: NodeJS.Timeout } | null>(null);
   const hintRef = useRef<HTMLSpanElement>(null);
   const linkRef = useRef<HTMLAnchorElement>(null);
   // Swipe refs — no re-renders during gesture
@@ -109,12 +113,63 @@ export default function NotesPage() {
   const handleDeleteClick = (e: React.MouseEvent, date: string) => {
     e.preventDefault();
     e.stopPropagation();
-    setSelectedDateToDelete(date);
-    setDeleteDialogOpen(true);
+    startPendingDeletion(date);
+  };
+
+  const startPendingDeletion = async (date: string) => {
+    const dayToDelete = days.find(d => d.date === date);
+    if (!dayToDelete) return;
+
+    // Store pending deletion
+    const timeoutId = setTimeout(() => {
+      // Permanent delete after timeout
+      setPendingDeletion(null);
+    }, 5000);
+
+    setPendingDeletion({
+      date,
+      entries: dayToDelete.entries,
+      timeoutId,
+    });
+
+    // Show toast with undo
+    addToast({
+      message: `${dayToDelete.entries.length} entry deleted`,
+      type: "warning",
+      duration: 5000,
+      action: {
+        label: "Undo",
+        onClick: () => handleUndoRestore(date, dayToDelete.entries),
+      },
+    });
+
+    // Optimistically update UI
+    setDays((prev) => prev.filter((d) => d.date !== date));
+  };
+
+  const handleUndoRestore = async (date: string, entries: JournalEntry[]) => {
+    // Clear the timeout
+    if (pendingDeletion?.timeoutId) {
+      clearTimeout(pendingDeletion.timeoutId);
+    }
+    setPendingDeletion(null);
+
+    // Restore all entries
+    for (const entry of entries) {
+      await storage.restoreEntry(entry);
+    }
+
+    // Reload days to show restored entry
+    await loadAllDays();
   };
 
   const handleConfirmDelete = async () => {
     if (selectedDateToDelete) {
+      // Clear any pending deletion for this date
+      if (pendingDeletion?.date === selectedDateToDelete) {
+        clearTimeout(pendingDeletion.timeoutId);
+        setPendingDeletion(null);
+      }
       await storage.deleteDay(selectedDateToDelete);
       await loadAllDays();
       setSelectedDateToDelete(null);
@@ -244,8 +299,7 @@ export default function NotesPage() {
           openSwipeDate.current = null;
           hideBg(date);
         });
-        setSelectedDateToDelete(date);
-        setDeleteDialogOpen(true);
+        startPendingDeletion(date);
       } else {
         // Snap to open position
         animateSwipe(el, -SWIPE_ACTION_WIDTH);
@@ -256,7 +310,7 @@ export default function NotesPage() {
       animateSwipe(el, 0, () => hideBg(date));
       openSwipeDate.current = null;
     }
-  }, [animateSwipe, hideBg]);
+  }, [animateSwipe, hideBg, startPendingDeletion]);
 
   if (loading) {
     return (

@@ -42,7 +42,11 @@ export function JournalPage() {
   // Show toast when save error occurs
   useEffect(() => {
     if (saveError) {
-      addToast(saveError.message, "error", 5000);
+      addToast({
+        message: saveError.message,
+        type: "error",
+        duration: 5000,
+      });
       clearSaveError();
     }
   }, [saveError, addToast, clearSaveError]);
@@ -160,7 +164,11 @@ export function JournalPage() {
                   hour={hour}
                   entry={entry}
                   onSave={saveEntry}
-                  onError={(message) => addToast(message, "error", 5000)}
+                  onError={(message) => addToast({
+                    message,
+                    type: "error",
+                    duration: 5000,
+                  })}
                   isCurrentHour={isCurrentHour}
                   isFocused={isFocused}
                   isHovered={isHovered}
