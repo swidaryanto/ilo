@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { IconAlertCircle, IconCheck, IconX, IconArrowLeft } from "@tabler/icons-react";
+import { IconAlertCircle, IconCheck, IconX } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
 export type ToastType = "error" | "success" | "info" | "warning";
@@ -51,7 +51,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
       {children}
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm px-4">
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-[492px] px-6 md:px-0">
         {toasts.map((toast) => (
           <ToastItem
             key={toast.id}
@@ -112,7 +112,6 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
       )}
     >
       <div className="flex items-start gap-3">
-        <div className="shrink-0 mt-0.5">{icons[toast.type]}</div>
         <p className="text-sm text-foreground flex-1">{toast.message}</p>
         <button
           onClick={onDismiss}
@@ -130,7 +129,6 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
           }}
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-background border border-border rounded-md hover:bg-accent hover:border-accent-foreground/20 transition-colors self-start"
         >
-          <IconArrowLeft className="h-3.5 w-3.5 rotate-180" />
           {toast.action.label}
         </button>
       )}
