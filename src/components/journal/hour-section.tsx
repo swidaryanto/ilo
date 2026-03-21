@@ -8,7 +8,7 @@ import type { JournalEntry, Mood } from "@/lib/types/journal";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { StreakBadge } from "@/components/streak-badge";
-import { MoodSelector, MoodBadge } from "@/components/mood-selector";
+import { MoodSelector, getMoodEmoji } from "@/components/mood-selector";
 import { IconAlertCircle } from "@tabler/icons-react";
 
 interface HourSectionProps {
@@ -93,6 +93,7 @@ export function HourSection({
   const hasContent = content && content.trim().length > 0;
   const shouldShowPlaceholder = isCurrentHour && !hasContent;
   const showMoodSelector = isFocused || hasContent || mood;
+  const moodEmoji = getMoodEmoji(mood);
 
   return (
     <div
@@ -101,11 +102,18 @@ export function HourSection({
         isBlurred && "opacity-30 blur-md"
       )}
     >
-      {/* Left: Hour label */}
+      {/* Left: Hour label with mood emoji */}
       <div className="flex flex-col gap-2 min-w-[60px] items-start justify-center relative">
-        <span className="text-sm font-medium text-muted-foreground">
-          {formatHour(hour)}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm font-medium text-muted-foreground">
+            {formatHour(hour)}
+          </span>
+          {moodEmoji && (
+            <span className="text-sm" title={mood}>
+              {moodEmoji}
+            </span>
+          )}
+        </div>
         {isSaving && (
           <span className="text-xs text-muted-foreground">Saving...</span>
         )}
@@ -122,8 +130,8 @@ export function HourSection({
         />
       </div>
 
-      {/* Middle: Input with fixed width */}
-      <div className="flex flex-col relative w-[400px]">
+      {/* Middle: Input with mood selector below */}
+      <div className="flex-1 flex flex-col">
         <Textarea
           ref={textareaRef}
           value={content || ""}
@@ -156,18 +164,14 @@ export function HourSection({
           )}
           rows={1}
         />
-      </div>
-
-      {/* Right: Mood selector */}
-      {showMoodSelector && (
-        <div className="flex items-start pt-1">
+        {showMoodSelector && (
           <MoodSelector
             selectedMood={mood}
             onMoodSelect={handleMoodChange}
-            className=""
+            className="mt-2"
           />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
