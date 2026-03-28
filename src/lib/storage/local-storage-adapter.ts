@@ -159,18 +159,29 @@ export class LocalStorageAdapter implements JournalStorage {
 
     const days: JournalDay[] = [];
 
+    // Collect all date keys first to avoid issues with shifting indices during iteration
+    // Exclude special keys like journal:trash
+    const keys: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith(STORAGE_PREFIX)) {
         const date = key.replace(STORAGE_PREFIX, "");
-        const entries = await this.getEntries(date);
+        // Skip special storage keys (trash, settings, etc.)
+        if (date === "trash") continue;
+        keys.push(key);
+      }
+    }
 
-        if (entries.length > 0) {
-          days.push({
-            date,
-            entries: entries.sort((a, b) => a.hour - b.hour),
-          });
-        }
+    // Now iterate over the collected date keys
+    for (const key of keys) {
+      const date = key.replace(STORAGE_PREFIX, "");
+      const entries = await this.getEntries(date);
+
+      if (entries.length > 0) {
+        days.push({
+          date,
+          entries: entries.sort((a, b) => a.hour - b.hour),
+        });
       }
     }
 
