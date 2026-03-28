@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback, useState } from "react";
 import { LocalStorageAdapter } from "@/lib/storage/local-storage-adapter";
+import { TrashStorage } from "@/lib/storage/trash-storage";
 import type { JournalDay } from "@/lib/types/journal";
 import { formatDate, formatDateDisplay, formatDateShortDisplay } from "@/lib/utils/date";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -26,6 +27,7 @@ const VELOCITY_THRESHOLD = 0.4;
 const DEAD_ZONE = 10;
 
 const storage = new LocalStorageAdapter();
+const trashStorage = new TrashStorage();
 
 export default function NotesPage() {
   const router = useRouter();
@@ -38,6 +40,7 @@ export default function NotesPage() {
   const [selectedDateToDelete, setSelectedDateToDelete] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [pendingDeletion, setPendingDeletion] = useState<{ date: string; entries: JournalEntry[]; timeoutId: NodeJS.Timeout } | null>(null);
+  const [trashCount, setTrashCount] = useState(0);
   const hintRef = useRef<HTMLSpanElement>(null);
   const linkRef = useRef<HTMLAnchorElement>(null);
   // Swipe refs — no re-renders during gesture
@@ -81,8 +84,14 @@ export default function NotesPage() {
     }
   };
 
+  const loadTrashCount = async () => {
+    const count = await trashStorage.getTrashCount();
+    setTrashCount(count);
+  };
+
   useEffect(() => {
     loadAllDays();
+    loadTrashCount();
   }, []);
 
   // Swipe hint — show on every page load, animated via direct DOM manipulation
@@ -120,23 +129,17 @@ export default function NotesPage() {
     const dayToDelete = days.find(d => d.date === date);
     if (!dayToDelete) return;
 
-    // Store pending deletion
-    const timeoutId = setTimeout(() => {
-      // Permanent delete after timeout
-      setPendingDeletion(null);
-    }, 5000);
+    // Move to trash immediately
+    await trashStorage.addToTrash(dayToDelete);
 
-    setPendingDeletion({
-      date,
-      entries: dayToDelete.entries,
-      timeoutId,
-    });
+    // Delete from main storage
+    await storage.deleteDay(date);
 
     // Show toast with undo
     const entriesWithContent = dayToDelete.entries.filter(e => e.content.trim().length > 0);
     const entryCount = entriesWithContent.length;
     const entryWord = entryCount === 1 ? "entry" : "entries";
-    
+
     addToast({
       message: `${entryCount} ${entryWord} deleted`,
       type: "warning",
@@ -149,22 +152,27 @@ export default function NotesPage() {
 
     // Optimistically update UI
     setDays((prev) => prev.filter((d) => d.date !== date));
+    await loadTrashCount();
   };
 
   const handleUndoRestore = async (date: string, entries: JournalEntry[]) => {
-    // Clear the timeout
-    if (pendingDeletion?.timeoutId) {
-      clearTimeout(pendingDeletion.timeoutId);
-    }
-    setPendingDeletion(null);
-
-    // Restore all entries
+    // Restore all entries from trash
     for (const entry of entries) {
-      await storage.restoreEntry(entry);
+      await trashStorage.restoreEntryToStorage(entry);
     }
+
+    // Remove from trash
+    await trashStorage.permanentlyDelete(date);
 
     // Reload days to show restored entry
     await loadAllDays();
+    await loadTrashCount();
+
+    addToast({
+      message: "Entry restored",
+      type: "success",
+      duration: 3000,
+    });
   };
 
   const handleConfirmDelete = async () => {
@@ -420,6 +428,21 @@ export default function NotesPage() {
                           {isDark ? "Light theme" : "Dark theme"}
                         </span>
                       </button>
+
+                      {/* Trash Link */}
+                      <Link href="/notes/trash">
+                        <button className="flex items-center gap-2 w-full px-2.5 py-2 rounded-md hover:bg-accent/50 transition-colors text-left">
+                          <div className="relative">
+                            <IconTrash className="h-4 w-4" />
+                            {trashCount > 0 && (
+                              <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-orange-500 text-white text-[9px] font-bold flex items-center justify-center rounded-full">
+                                {trashCount > 9 ? '9+' : trashCount}
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-sm">Trash</span>
+                        </button>
+                      </Link>
 
                       {/* Divider */}
                       <div className="h-px bg-border mx-2 my-0.5" />

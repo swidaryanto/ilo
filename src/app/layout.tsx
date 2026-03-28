@@ -29,6 +29,7 @@ export const metadata: Metadata = {
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ExportButton } from "@/components/export-button";
+import { TrashButton } from "@/components/trash-button";
 import { ToastProvider } from "@/components/ui/toast";
 
 export default function RootLayout({
@@ -52,6 +53,7 @@ export default function RootLayout({
             <div className="hidden md:flex fixed left-4 top-1/2 -translate-y-1/2 z-50 flex-col items-center gap-2">
               <ExportButton />
               <ThemeToggle />
+              <TrashButton />
             </div>
 
             {children}
