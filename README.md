@@ -16,16 +16,6 @@ No setup. No accounts. Just open it and start writing.
 - **Dark/Light theme** — toggle between themes for comfortable writing in any lighting
 - **Multiple views** — switch between list and calendar views to browse your entries
 
-## How it's built
-
-| Layer | Approach |
-|---|---|
-| Storage | localStorage with a clean adapter pattern — ready to swap in a real database |
-| Auto-save | 500ms debounce on content change |
-| Data shape | Maps directly to a future database schema (date, hour, content, mood, timestamps) |
-| Structure | Storage interface, hooks, and components are kept separate |
-| Error handling | Toast notifications for save failures, localStorage availability checks |
-
 ## Features
 
 ### Journal Entry
@@ -44,11 +34,3 @@ No setup. No accounts. Just open it and start writing.
 - Settings menu (⋯) for theme toggle
 - Responsive layout
 - Touch-friendly interactions
-
-## What's next
-
-- [ ] Database migration (PostgreSQL / SQLite)
-- [ ] Search and filtering across entries
-- [ ] Export to text or markdown
-- [ ] Rich text support
-- [ ] Mood analytics and trends
