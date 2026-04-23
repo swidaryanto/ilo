@@ -3,21 +3,21 @@
 import * as React from "react";
 import { IconTrash } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { TrashStorage } from "@/lib/storage/trash-storage";
 import Link from "next/link";
+import { useStorage } from "@/hooks/use-storage";
 
 export function TrashButton() {
     const [trashCount, setTrashCount] = React.useState(0);
     const [showTooltip, setShowTooltip] = React.useState(false);
+    const { trashStorage } = useStorage();
 
     React.useEffect(() => {
         const loadCount = async () => {
-            const storage = new TrashStorage();
-            const count = await storage.getTrashCount();
+            const count = await trashStorage.getTrashCount();
             setTrashCount(count);
         };
         loadCount();
-    }, []);
+    }, [trashStorage]);
 
     return (
         <div className="relative group">

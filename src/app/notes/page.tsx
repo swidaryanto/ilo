@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useCallback, useState } from "react";
-import { LocalStorageAdapter } from "@/lib/storage/local-storage-adapter";
-import { TrashStorage } from "@/lib/storage/trash-storage";
 import type { JournalDay } from "@/lib/types/journal";
+import { useStorage } from "@/hooks/use-storage";
 import { formatDate, formatDateDisplay, formatDateShortDisplay } from "@/lib/utils/date";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,7 @@ import { useToast } from "@/components/ui/toast";
 import type { Mood } from "@/lib/types/journal";
 import type { JournalEntry } from "@/lib/types/journal";
 import Link from "next/link";
+import { AuthButton } from "@/components/auth/auth-button";
 
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -26,13 +26,11 @@ const SWIPE_THRESHOLD = 40;
 const VELOCITY_THRESHOLD = 0.4;
 const DEAD_ZONE = 10;
 
-const storage = new LocalStorageAdapter();
-const trashStorage = new TrashStorage();
-
 export default function NotesPage() {
   const router = useRouter();
   const { addToast } = useToast();
   const { setTheme, theme } = useTheme();
+  const { storage, trashStorage } = useStorage();
   const isDark = theme === "dark";
   const [days, setDays] = useState<JournalDay[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,11 +65,10 @@ export default function NotesPage() {
   const currentDateDisplay = formatDateShortDisplay(formatDate(today));
   const daysLeftLabel = `${currentDateDisplay} • ${daysLeftInMonth}d left`;
 
-  const loadAllDays = async () => {
+  const loadAllDays = useCallback(async () => {
     setLoading(true);
     try {
       const allDays = await storage.getAllDays();
-      // Only keep days where at least one entry has text content
       const filteredDays = allDays.filter(day =>
         day.entries.some(entry => entry.content.trim().length > 0)
       );
@@ -82,17 +79,17 @@ export default function NotesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [storage]);
 
-  const loadTrashCount = async () => {
+  const loadTrashCount = useCallback(async () => {
     const count = await trashStorage.getTrashCount();
     setTrashCount(count);
-  };
+  }, [trashStorage]);
 
   useEffect(() => {
     loadAllDays();
     loadTrashCount();
-  }, []);
+  }, [loadAllDays, loadTrashCount]);
 
   // Swipe hint — show on every page load, animated via direct DOM manipulation
   useEffect(() => {
@@ -443,6 +440,14 @@ export default function NotesPage() {
                           <span className="text-sm">Trash</span>
                         </button>
                       </Link>
+
+                      {/* Divider */}
+                      <div className="h-px bg-border mx-2 my-0.5" />
+
+                      {/* Auth */}
+                      <div className="px-2.5 py-2">
+                        <AuthButton />
+                      </div>
 
                       {/* Divider */}
                       <div className="h-px bg-border mx-2 my-0.5" />

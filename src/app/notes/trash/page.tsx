@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { TrashStorage, type TrashItem } from "@/lib/storage/trash-storage";
+import { useEffect, useState, useCallback } from "react";
+import type { TrashItem } from "@/lib/storage/trash-storage";
+import { useStorage } from "@/hooks/use-storage";
 import { formatDateDisplay } from "@/lib/utils/date";
 import { Button } from "@/components/ui/button";
 import { IconTrash, IconRotate2, IconArrowLeft, IconAlertTriangle } from "@tabler/icons-react";
@@ -11,25 +12,24 @@ import type { Mood } from "@/lib/types/journal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const storage = new TrashStorage();
-
 export default function TrashPage() {
   const router = useRouter();
   const { addToast } = useToast();
+  const { trashStorage: storage } = useStorage();
   const [trashItems, setTrashItems] = useState<TrashItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
-  const loadTrash = async () => {
+  const loadTrash = useCallback(async () => {
     setLoading(true);
     const items = await storage.getTrashItems();
     setTrashItems(items);
     setLoading(false);
-  };
+  }, [storage]);
 
   useEffect(() => {
     loadTrash();
-  }, []);
+  }, [loadTrash]);
 
   const handleRestore = async (date: string) => {
     const item = trashItems.find(i => i.day.date === date);

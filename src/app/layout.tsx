@@ -31,6 +31,9 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { ExportButton } from "@/components/export-button";
 import { TrashButton } from "@/components/trash-button";
 import { ToastProvider } from "@/components/ui/toast";
+import { SessionProvider } from "@/components/auth/session-provider";
+import { AuthButton } from "@/components/auth/auth-button";
+import { MigrationBanner } from "@/components/migration-banner";
 
 export default function RootLayout({
   children,
@@ -48,16 +51,21 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ToastProvider>
-            {/* Desktop: Fixed left sidebar */}
-            <div className="hidden md:flex fixed left-4 top-1/2 -translate-y-1/2 z-50 flex-col items-center gap-2">
-              <ExportButton />
-              <ThemeToggle />
-              <TrashButton />
-            </div>
+          <SessionProvider>
+            <ToastProvider>
+              <MigrationBanner />
 
-            {children}
-          </ToastProvider>
+              {/* Desktop: Fixed left sidebar */}
+              <div className="hidden md:flex fixed left-4 top-1/2 -translate-y-1/2 z-50 flex-col items-center gap-2">
+                <ExportButton />
+                <ThemeToggle />
+                <TrashButton />
+                <AuthButton />
+              </div>
+
+              {children}
+            </ToastProvider>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

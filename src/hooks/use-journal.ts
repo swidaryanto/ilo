@@ -2,11 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { JournalEntry, Mood } from "@/lib/types/journal";
-import { LocalStorageAdapter } from "@/lib/storage/local-storage-adapter";
-import type { JournalStorage } from "@/lib/storage/journal-storage";
 import { formatDate } from "@/lib/utils/date";
-
-const storage: JournalStorage = new LocalStorageAdapter();
+import { useStorage } from "@/hooks/use-storage";
 
 function generateEntryId(date: string, hour: number): string {
   return `${date}-${hour}`;
@@ -25,29 +22,34 @@ export function useJournal(initialDate?: string) {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [saveError, setSaveError] = useState<SaveError | null>(null);
+  const { storage, isLoading: storageLoading } = useStorage();
 
-  const loadEntries = useCallback(async (date: string) => {
-    setLoading(true);
-    try {
-      const loadedEntries = await storage.getEntries(date);
-      setEntries(loadedEntries);
-      setSaveError(null);
-    } catch (error) {
-      console.error("Failed to load entries:", error);
-      setEntries([]);
-      setSaveError({
-        hour: -1,
-        message: "Failed to load journal entries. Your data may not be accessible.",
-        timestamp: Date.now(),
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const loadEntries = useCallback(
+    async (date: string) => {
+      setLoading(true);
+      try {
+        const loadedEntries = await storage.getEntries(date);
+        setEntries(loadedEntries);
+        setSaveError(null);
+      } catch (error) {
+        console.error("Failed to load entries:", error);
+        setEntries([]);
+        setSaveError({
+          hour: -1,
+          message: "Failed to load journal entries. Your data may not be accessible.",
+          timestamp: Date.now(),
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [storage]
+  );
 
   useEffect(() => {
+    if (storageLoading) return;
     loadEntries(selectedDate);
-  }, [selectedDate, loadEntries]);
+  }, [selectedDate, loadEntries, storageLoading]);
 
   const saveEntry = useCallback(
     async (hour: number, content: string, mood?: Mood): Promise<boolean> => {
@@ -84,7 +86,7 @@ export function useJournal(initialDate?: string) {
         return false;
       }
     },
-    [selectedDate, entries]
+    [selectedDate, entries, storage]
   );
 
   const getEntryForHour = useCallback(
@@ -101,11 +103,10 @@ export function useJournal(initialDate?: string) {
   return {
     selectedDate,
     entries,
-    loading,
+    loading: loading || storageLoading,
     saveEntry,
     getEntryForHour,
     saveError,
     clearSaveError,
   };
 }
-

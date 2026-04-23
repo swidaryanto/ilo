@@ -3,12 +3,13 @@
 import * as React from "react";
 import { IconDownload } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { LocalStorageAdapter } from "@/lib/storage/local-storage-adapter";
 import { formatDateDisplay } from "@/lib/utils/date";
+import { useStorage } from "@/hooks/use-storage";
 
 export function ExportButton() {
+    const { storage } = useStorage();
+
     const handleExport = async () => {
-        const storage = new LocalStorageAdapter();
         const allDays = await storage.getAllDays();
 
         if (allDays.length === 0) {

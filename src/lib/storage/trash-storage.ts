@@ -1,4 +1,5 @@
 import type { JournalDay, JournalEntry } from "@/lib/types/journal";
+import type { TrashStorageInterface } from "./trash-storage-interface";
 
 const TRASH_KEY = "journal:trash";
 const TRASH_EXPIRY_DAYS = 30;
@@ -19,7 +20,7 @@ function isExpired(item: TrashItem): boolean {
   return new Date(item.expiresAt) < new Date();
 }
 
-export class TrashStorage {
+export class TrashStorage implements TrashStorageInterface {
   async getTrashItems(): Promise<TrashItem[]> {
     if (typeof window === "undefined") {
       return [];
