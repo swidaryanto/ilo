@@ -1,7 +1,14 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
-import Image from "next/image";
+
+function EllipseIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" fill="#5058f2" r="9" />
+    </svg>
+  );
+}
 
 function GoogleIcon() {
   return (
@@ -42,19 +49,7 @@ export function AuthButton() {
           className="rounded-full w-8 h-8 flex items-center justify-center hover:bg-accent/50 transition-all overflow-hidden"
           aria-label="Sign out"
         >
-          {session.user.image ? (
-            <Image
-              src={session.user.image}
-              alt={session.user.name ?? "User"}
-              width={28}
-              height={28}
-              className="rounded-full"
-            />
-          ) : (
-            <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
-              {session.user.name?.[0] ?? "U"}
-            </div>
-          )}
+          <EllipseIcon />
         </button>
         {/* Tooltip */}
         <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
