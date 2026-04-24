@@ -6,7 +6,6 @@ import {
   hasMigrationFlag,
   setMigrationFlag,
   getLocalStorageJournalData,
-  getLocalStorageTrashData,
 } from "@/lib/storage/migration";
 
 export type MigrationState =
@@ -35,17 +34,20 @@ export function useMigration() {
     setMigrationState({ status: "migrating" });
     try {
       const days = getLocalStorageJournalData();
-      const trash = getLocalStorageTrashData();
 
-      const res = await fetch("/api/journal/migrate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ days, trash }),
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error((body as { error?: string }).error ?? "Migration request failed");
+      for (const day of days) {
+        for (const entry of day.entries) {
+          if (!entry.content.trim()) continue;
+          const res = await fetch(`/api/journal/${day.date}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(entry),
+          });
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            throw new Error((body as { error?: string }).error ?? "Failed to save entry");
+          }
+        }
       }
 
       setMigrationFlag();
