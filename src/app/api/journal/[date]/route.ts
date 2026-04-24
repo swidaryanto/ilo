@@ -57,18 +57,15 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     const entry = (await req.json()) as JournalEntry;
     const db = createServerSupabaseClient();
 
-    const { error } = await db.from("journal_entries").upsert(
-      {
-        id: entry.id,
-        user_id: session.user.id,
-        date,
-        hour: entry.hour,
-        content: entry.content,
-        mood: entry.mood ?? null,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "id,user_id" }
-    );
+    const { error } = await db.from("journal_entries").upsert({
+      id: entry.id,
+      user_id: session.user.id,
+      date,
+      hour: entry.hour,
+      content: entry.content,
+      mood: entry.mood ?? null,
+      updated_at: new Date().toISOString(),
+    });
 
     if (error) {
       console.error("[journal/date] upsert error:", error);
