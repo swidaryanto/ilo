@@ -46,7 +46,7 @@ export function AuthButton() {
         <button
           type="button"
           onClick={() => signOut()}
-          className="rounded-full w-8 h-8 flex items-center justify-center hover:bg-accent/50 transition-all overflow-hidden"
+          className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 overflow-hidden hover:scale-110 hover:shadow-[0_0_0_3px_rgba(80,88,242,0.25)] active:scale-95 active:shadow-none"
           aria-label="Sign out"
         >
           <EllipseIcon />
@@ -69,7 +69,7 @@ export function AuthButton() {
       <button
         type="button"
         onClick={() => signIn("google")}
-        className="rounded-full w-8 h-8 flex items-center justify-center hover:bg-accent/50 transition-all border border-border bg-background"
+        className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 border border-border bg-background hover:scale-110 hover:shadow-[0_0_0_3px_rgba(66,133,244,0.2)] hover:border-[#4285F4]/40 active:scale-95 active:shadow-none"
         aria-label="Sign in with Google"
       >
         <GoogleIcon />
