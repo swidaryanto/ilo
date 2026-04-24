@@ -44,8 +44,11 @@ export function useMigration() {
             body: JSON.stringify(entry),
           });
           if (!res.ok) {
-            const body = await res.json().catch(() => ({}));
-            throw new Error((body as { error?: string }).error ?? "Failed to save entry");
+            const text = await res.text();
+            console.error(`[migration] POST /api/journal/${day.date} → ${res.status}:`, text);
+            let message = "Failed to save entry";
+            try { message = (JSON.parse(text) as { error?: string }).error ?? message; } catch {}
+            throw new Error(message);
           }
         }
       }
