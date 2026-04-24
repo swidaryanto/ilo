@@ -75,8 +75,13 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof Response) return err;
-    const message = err instanceof Error ? err.message : "Failed to save entry";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const e = err as { message?: string; code?: string; details?: string; hint?: string };
+    const message =
+      e?.message ?? e?.details ?? e?.hint ?? "Failed to save entry";
+    return NextResponse.json(
+      { error: message, code: e?.code, details: e?.details, hint: e?.hint },
+      { status: 500 }
+    );
   }
 }
 
