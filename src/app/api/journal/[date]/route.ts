@@ -70,12 +70,16 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       { onConflict: "id,user_id" }
     );
 
-    if (error) throw error;
+    if (error) {
+      console.error("[journal/date] upsert error:", error);
+      throw error;
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof Response) return err;
-    return NextResponse.json({ error: "Failed to save entry" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Failed to save entry";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
