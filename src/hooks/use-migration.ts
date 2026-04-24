@@ -43,7 +43,10 @@ export function useMigration() {
         body: JSON.stringify({ days, trash }),
       });
 
-      if (!res.ok) throw new Error("Migration request failed");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error((body as { error?: string }).error ?? "Migration request failed");
+      }
 
       setMigrationFlag();
       setMigrationState({ status: "done" });

@@ -26,10 +26,12 @@ export async function POST(req: NextRequest) {
           mood: (e.mood as Mood | undefined) ?? null,
           created_at: e.createdAt,
           updated_at: e.updatedAt,
-        })),
-        { onConflict: "id,user_id", ignoreDuplicates: true }
+        }))
       );
-      if (error) throw error;
+      if (error) {
+        console.error("[migrate] journal_entries upsert error:", error);
+        throw error;
+      }
       migratedDays = body.days.length;
     }
 
@@ -40,16 +42,21 @@ export async function POST(req: NextRequest) {
           date: item.day.date,
           entries_json: item.day.entries,
           expires_at: item.expiresAt,
-        })),
-        { onConflict: "user_id,date", ignoreDuplicates: true }
+        }))
       );
-      if (error) throw error;
-      migratedTrashItems = body.trash.length;
+      if (error) {
+        console.error("[migrate] journal_trash upsert error:", error);
+        // Don't block migration if only trash fails
+      } else {
+        migratedTrashItems = body.trash.length;
+      }
     }
 
     return NextResponse.json({ migratedDays, migratedTrashItems });
   } catch (err) {
     if (err instanceof Response) return err;
-    return NextResponse.json({ error: "Migration failed" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Migration failed";
+    console.error("[migrate] unhandled error:", err);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
