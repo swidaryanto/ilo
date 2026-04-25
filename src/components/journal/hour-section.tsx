@@ -106,9 +106,6 @@ export function HourSection({
         <span className="text-sm font-medium text-muted-foreground">
           {formatHour(hour)}
         </span>
-        {isSaving && (
-          <span className="text-xs text-muted-foreground">Saving...</span>
-        )}
         {saveFailed && (
           <span className="text-xs text-red-500 flex items-center gap-1">
             <IconAlertCircle className="h-3 w-3" />

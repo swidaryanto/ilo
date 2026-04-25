@@ -104,17 +104,11 @@ export function JournalPage() {
 
 
   if (loading) {
-    const quotes = [
-      "The life of every man is a diary in which he means to write one story, and writes another.",
-      "Journal writing is a voyage to the interior.",
-      "Fill your paper with the breathings of your heart.",
-      "Write what disturbs you, what you fear, what you have not been willing to speak about.",
-      "In the journal I am at ease.",
-    ];
+    const quotes = ["Write it down.", "Words heal you.", "Begin right now.", "Tell your truth.", "Just keep writing."];
     const quote = quotes[Math.floor(Math.random() * quotes.length)];
     return (
       <div className="flex flex-col items-center justify-center h-screen px-10 gap-3">
-        <p className="text-center text-muted-foreground text-sm italic leading-relaxed max-w-xs">&ldquo;{quote}&rdquo;</p>
+        <p className="text-center text-muted-foreground text-sm italic">&ldquo;{quote}&rdquo;</p>
       </div>
     );
   }
