@@ -36,7 +36,7 @@ export function HourSection({
   onNavigateUp,
   onNavigateDown,
 }: HourSectionProps) {
-  const { content, handleChange, handleBlur, saveFailed } = useHourNotes({
+  const { content, handleChange, handleFocus, handleBlur, saveFailed } = useHourNotes({
     hour,
     entry,
     onSave,
@@ -85,11 +85,8 @@ export function HourSection({
           ref={textareaRef}
           value={content || ""}
           onChange={(e) => handleChange(e.target.value)}
-          onFocus={onFocus}
-          onBlur={() => {
-            handleBlur();
-            onBlur?.();
-          }}
+          onFocus={() => { handleFocus(); onFocus?.(); }}
+          onBlur={() => { handleBlur(); onBlur?.(); }}
           onKeyDown={(e) => {
             const textarea = e.currentTarget;
             const cursorPosition = textarea.selectionStart || 0;
