@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Geist, Geist_Mono, Playwrite_NO } from "next/font/google";
 
 import "./globals.css";
 
@@ -14,11 +14,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const instrumentSerif = Instrument_Serif({
+const playwriteNo = Playwrite_NO({
   variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: "400",
-  style: "italic",
+  weight: ["100", "200", "300", "400"],
 });
 
 export const metadata: Metadata = {
@@ -46,7 +44,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} antialiased max-w-xl mx-auto `}
+        className={`${geistSans.variable} ${geistMono.variable} ${playwriteNo.variable} antialiased max-w-xl mx-auto `}
       >
         <ThemeProvider
           attribute="class"
