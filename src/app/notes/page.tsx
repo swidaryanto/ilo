@@ -447,7 +447,7 @@ export default function NotesPage() {
 
                       {/* Auth */}
                       <div className="px-2.5 py-2">
-                        <AuthButton />
+                        <AuthButton variant="mobile" />
                       </div>
 
                       {/* Divider */}

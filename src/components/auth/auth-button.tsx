@@ -3,7 +3,15 @@
 import { useSession, signIn, signOut } from "next-auth/react";
 
 function LogoutIcon() {
-  return <img src="/logout.svg" width={20} height={20} alt="" aria-hidden="true" />;
+  return <img src="/logout.svg" width={20} height={20} alt="" aria-hidden="true" style={{ pointerEvents: "none" }} />;
+}
+
+function EllipseIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" style={{ pointerEvents: "none" }}>
+      <circle cx="12" cy="12" fill="#5058f2" r="9" />
+    </svg>
+  );
 }
 
 function GoogleIcon() {
@@ -29,7 +37,7 @@ function GoogleIcon() {
   );
 }
 
-export function AuthButton() {
+export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -42,10 +50,10 @@ export function AuthButton() {
         <button
           type="button"
           onClick={() => signOut()}
-          className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 hover:scale-110 hover:shadow-[0_0_0_3px_rgba(0,0,0,0.1)] active:scale-95 active:shadow-none"
+          className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 overflow-hidden hover:scale-110 hover:shadow-[0_0_0_3px_rgba(80,88,242,0.25)] active:scale-95 active:shadow-none"
           aria-label="Sign out"
         >
-          <LogoutIcon />
+          {variant === "mobile" ? <LogoutIcon /> : <EllipseIcon />}
         </button>
         {/* Tooltip */}
         <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
