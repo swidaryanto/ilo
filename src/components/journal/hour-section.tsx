@@ -1,11 +1,9 @@
 "use client";
 
-import * as React from "react";
 import { useEffect, useRef } from "react";
 import { useHourNotes } from "@/hooks/use-hour-notes";
 import { formatHour } from "@/lib/utils/date";
 import type { JournalEntry } from "@/lib/types/journal";
-import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { IconAlertCircle } from "@tabler/icons-react";
 
@@ -36,27 +34,28 @@ export function HourSection({
   onNavigateUp,
   onNavigateDown,
 }: HourSectionProps) {
-  const { content, handleChange, handleFocus, handleBlur, saveFailed } = useHourNotes({
-    hour,
-    entry,
-    onSave,
-    onError,
-  });
-
+  const { initialContent, handleBlur } = useHourNotes({ hour, entry, onSave, onError });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const saveFailed = useRef(false);
 
+  // Focus management only — no value control
   useEffect(() => {
     if (isFocused && textareaRef.current) {
-      requestAnimationFrame(() => {
-        if (textareaRef.current) {
-          textareaRef.current.focus();
-        }
-      });
+      requestAnimationFrame(() => textareaRef.current?.focus());
     }
   }, [isFocused]);
 
+  // Auto-resize on initial render
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = el.scrollHeight + "px";
+    }
+  }, []);
+
   const isBlurred = !isFocused && !isHovered;
-  const hasContent = content && content.trim().length > 0;
+  const hasContent = (entry?.content || "").trim().length > 0;
   const shouldShowPlaceholder = isCurrentHour && !hasContent;
 
   return (
@@ -71,7 +70,7 @@ export function HourSection({
         <span className="text-sm font-medium text-muted-foreground">
           {formatHour(hour)}
         </span>
-        {saveFailed && (
+        {saveFailed.current && (
           <span className="text-xs text-red-500 flex items-center gap-1">
             <IconAlertCircle className="h-3 w-3" />
             Save failed
@@ -79,21 +78,29 @@ export function HourSection({
         )}
       </div>
 
-      {/* Middle: Input */}
+      {/* Middle: Uncontrolled textarea */}
       <div className="flex-1">
-        <Textarea
+        <textarea
           ref={textareaRef}
-          value={content || ""}
-          onChange={(e) => handleChange(e.target.value)}
-          onFocus={() => { handleFocus(); onFocus?.(); }}
-          onBlur={() => { handleBlur(); onBlur?.(); }}
+          defaultValue={initialContent}
+          placeholder={shouldShowPlaceholder ? "What's on your mind?" : ""}
+          onFocus={onFocus}
+          onBlur={(e) => {
+            handleBlur(e.currentTarget.value);
+            onBlur?.();
+          }}
+          onInput={(e) => {
+            const el = e.currentTarget;
+            el.style.height = "auto";
+            el.style.height = el.scrollHeight + "px";
+          }}
           onKeyDown={(e) => {
             const textarea = e.currentTarget;
-            const cursorPosition = textarea.selectionStart || 0;
-            const isAtStart = cursorPosition === 0;
-            const isAtEnd = cursorPosition === textarea.value.length;
+            const pos = textarea.selectionStart || 0;
             const lines = textarea.value.split("\n");
-            const currentLine = textarea.value.substring(0, cursorPosition).split("\n").length - 1;
+            const currentLine = textarea.value.substring(0, pos).split("\n").length - 1;
+            const isAtStart = pos === 0;
+            const isAtEnd = pos === textarea.value.length;
 
             if (e.key === "ArrowUp" && currentLine === 0 && isAtStart) {
               e.preventDefault();
@@ -103,10 +110,10 @@ export function HourSection({
               onNavigateDown?.();
             }
           }}
-          placeholder={shouldShowPlaceholder ? "What's on your mind?" : ""}
           className={cn(
-            "border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-0 px-2 bg-transparent resize-none min-h-9 w-full",
-            saveFailed && "text-red-600 dark:text-red-400"
+            "w-full bg-transparent border-0 outline-none resize-none min-h-[36px] px-2 py-1.5",
+            "text-sm text-foreground placeholder:text-muted-foreground/50",
+            "focus:outline-none focus:ring-0"
           )}
           rows={1}
         />
