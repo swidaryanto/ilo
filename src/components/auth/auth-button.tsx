@@ -83,6 +83,20 @@ export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mob
     );
   }
 
+  if (variant === "mobile") {
+    return (
+      <button
+        type="button"
+        onClick={() => signIn("google")}
+        className="flex items-center gap-2 w-full px-2.5 py-2 rounded-md hover:bg-accent/50 transition-colors text-left"
+        aria-label="Login"
+      >
+        <img src="/login.svg" width={20} height={20} alt="" aria-hidden="true" style={{ pointerEvents: "none" }} />
+        <span className="text-sm text-foreground">Login</span>
+      </button>
+    );
+  }
+
   return (
     <div className="relative group">
       <button
