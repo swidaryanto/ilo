@@ -5,9 +5,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [Google],
   session: { strategy: "jwt" },
   callbacks: {
-    jwt({ token, user }) {
-      if (user?.id) {
-        token.sub = user.id;
+    jwt({ token, account, profile }) {
+      if (account?.provider === "google" && profile?.sub) {
+        token.sub = profile.sub;
       }
       return token;
     },
