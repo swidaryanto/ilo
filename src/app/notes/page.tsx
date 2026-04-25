@@ -446,9 +446,7 @@ export default function NotesPage() {
                       <div className="h-px bg-border mx-2 my-0.5" />
 
                       {/* Auth */}
-                      <div className="px-2.5 py-2">
-                        <AuthButton variant="mobile" />
-                      </div>
+                      <AuthButton variant="mobile" />
 
                       {/* Divider */}
                       <div className="h-px bg-border mx-2 my-0.5" />

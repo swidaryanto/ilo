@@ -45,6 +45,20 @@ export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mob
   }
 
   if (session) {
+    if (variant === "mobile") {
+      return (
+        <button
+          type="button"
+          onClick={() => signOut()}
+          className="flex items-center gap-2 w-full px-2.5 py-2 rounded-md hover:bg-accent/50 transition-colors text-left"
+          aria-label="Logout"
+        >
+          <LogoutIcon />
+          <span className="text-sm">Logout</span>
+        </button>
+      );
+    }
+
     return (
       <div className="relative group">
         <button
@@ -53,7 +67,7 @@ export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mob
           className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 overflow-hidden hover:scale-110 hover:shadow-[0_0_0_3px_rgba(80,88,242,0.25)] active:scale-95 active:shadow-none"
           aria-label="Sign out"
         >
-          {variant === "mobile" ? <LogoutIcon /> : <EllipseIcon />}
+          <EllipseIcon />
         </button>
         {/* Tooltip */}
         <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
