@@ -34,12 +34,15 @@ import { ToastProvider } from "@/components/ui/toast";
 import { SessionProvider } from "@/components/auth/session-provider";
 import { AuthButton } from "@/components/auth/auth-button";
 import { MigrationBanner } from "@/components/migration-banner";
+import { auth } from "@/auth";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -51,7 +54,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SessionProvider>
+          <SessionProvider session={session}>
             <ToastProvider>
               <MigrationBanner />
 
