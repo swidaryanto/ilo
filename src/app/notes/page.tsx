@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import type { JournalDay } from "@/lib/types/journal";
 import { useStorage } from "@/hooks/use-storage";
+import { useSession } from "next-auth/react";
 import { formatDate, formatDateDisplay, formatDateShortDisplay } from "@/lib/utils/date";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,8 @@ export default function NotesPage() {
   const router = useRouter();
   const { addToast } = useToast();
   const { setTheme, theme } = useTheme();
-  const { storage, trashStorage, isLoading: storageLoading, isAuthenticated } = useStorage();
+  const { storage, trashStorage, isLoading: storageLoading } = useStorage();
+  const { data: session } = useSession();
   const isDark = theme === "dark";
   const [days, setDays] = useState<JournalDay[]>([]);
   const [loading, setLoading] = useState(true);
@@ -456,7 +458,7 @@ export default function NotesPage() {
                         <div className="flex items-start gap-2 text-muted-foreground">
                           <IconInfoCircle className="h-4 w-4 shrink-0 mt-0.5" />
                           <span className="text-xs leading-relaxed">
-                            {isAuthenticated ? "Entries will be saved to your Google Account" : "Entries save automatically as you type"}
+                            {session ? "Entries will be saved to your Google Account" : "Entries save automatically as you type"}
                           </span>
                         </div>
                       </div>
