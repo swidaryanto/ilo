@@ -30,7 +30,7 @@ export default function NotesPage() {
   const router = useRouter();
   const { addToast } = useToast();
   const { setTheme, theme } = useTheme();
-  const { storage, trashStorage } = useStorage();
+  const { storage, trashStorage, isLoading: storageLoading } = useStorage();
   const isDark = theme === "dark";
   const [days, setDays] = useState<JournalDay[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,9 +87,10 @@ export default function NotesPage() {
   }, [trashStorage]);
 
   useEffect(() => {
+    if (storageLoading) return;
     loadAllDays();
     loadTrashCount();
-  }, [loadAllDays, loadTrashCount]);
+  }, [loadAllDays, loadTrashCount, storageLoading]);
 
   // Swipe hint — show on every page load, animated via direct DOM manipulation
   useEffect(() => {
