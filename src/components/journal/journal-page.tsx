@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/toast";
 import { EmptyState } from "@/components/empty-state";
 import Link from "next/link";
 
-export function JournalPage() {
+export function JournalPage({ initialEntries }: { initialEntries?: import("@/lib/types/journal").JournalEntry[] }) {
   const currentDate = formatDate(new Date());
   const { addToast } = useToast();
   const {
@@ -20,7 +20,7 @@ export function JournalPage() {
     saveError,
     clearSaveError,
     entries,
-  } = useJournal(currentDate);
+  } = useJournal(currentDate, initialEntries);
 
   const currentHour = new Date().getHours();
   const [focusedHour, setFocusedHour] = useState<number | null>(currentHour);

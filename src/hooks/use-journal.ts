@@ -15,12 +15,12 @@ export interface SaveError {
   timestamp: number;
 }
 
-export function useJournal(initialDate?: string) {
+export function useJournal(initialDate?: string, prefetchedEntries?: JournalEntry[]) {
   const [selectedDate] = useState<string>(
     initialDate || formatDate(new Date())
   );
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [entries, setEntries] = useState<JournalEntry[]>(prefetchedEntries ?? []);
+  const [loading, setLoading] = useState(!prefetchedEntries);
   const [saveError, setSaveError] = useState<SaveError | null>(null);
   const { storage, isLoading: storageLoading } = useStorage();
 
