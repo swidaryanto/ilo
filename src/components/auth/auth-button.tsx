@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
+import { BrailleSpinner } from "@/components/ui/braille-spinner";
 
 function LogoutIcon() {
   return <img src="/logout.svg" width={20} height={20} alt="" aria-hidden="true" style={{ pointerEvents: "none" }} />;
@@ -8,7 +9,7 @@ function LogoutIcon() {
 
 function EllipseIcon() {
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" style={{ pointerEvents: "none" }}>
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style={{ pointerEvents: "none" }}>
       <circle cx="12" cy="12" fill="#5058f2" r="9" />
     </svg>
   );
@@ -41,7 +42,7 @@ export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mob
   const { data: session, status } = useSession();
 
   if (status === "loading") {
-    return <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />;
+    return <BrailleSpinner className="text-muted-foreground text-base w-6 h-6 flex items-center justify-center" />;
   }
 
   if (session) {

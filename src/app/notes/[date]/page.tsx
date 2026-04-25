@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BrailleLoader } from "@/components/ui/braille-spinner";
 import { useJournal } from "@/hooks/use-journal";
 import { HourSection } from "@/components/journal/hour-section";
 import { formatDate, formatDateDisplay } from "@/lib/utils/date";
@@ -65,11 +66,7 @@ export default function DateNotesPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center size-full h-screen">
-        <div className="text-muted-foreground">Loading...</div>
-      </div>
-    );
+    return <BrailleLoader />;
   }
 
   return (

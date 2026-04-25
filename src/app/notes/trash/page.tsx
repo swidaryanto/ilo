@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { BrailleLoader } from "@/components/ui/braille-spinner";
 import type { TrashItem } from "@/lib/storage/trash-storage";
 import { useStorage } from "@/hooks/use-storage";
 import { formatDateDisplay } from "@/lib/utils/date";
@@ -90,7 +91,7 @@ export default function TrashPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center size-full h-screen">
-        <div className="text-muted-foreground animate-pulse">Loading...</div>
+        <BrailleLoader />
       </div>
     );
   }

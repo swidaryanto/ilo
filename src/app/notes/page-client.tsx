@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback, useState } from "react";
+import { BrailleLoader } from "@/components/ui/braille-spinner";
 import type { JournalDay } from "@/lib/types/journal";
 import { useStorage } from "@/hooks/use-storage";
 import { useSession } from "next-auth/react";
@@ -326,9 +327,7 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center size-full h-screen">
-        <div className="text-muted-foreground animate-pulse">Loading...</div>
-      </div>
+      <BrailleLoader />
     );
   }
 
