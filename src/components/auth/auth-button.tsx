@@ -54,7 +54,7 @@ export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mob
           aria-label="Logout"
         >
           <LogoutIcon />
-          <span className="text-sm">Logout</span>
+          <span className="text-sm text-foreground">Logout</span>
         </button>
       );
     }
