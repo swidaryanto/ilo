@@ -8,10 +8,9 @@ interface UseHourNotesProps {
   entry: JournalEntry | undefined;
   onSave: (hour: number, content: string) => Promise<boolean>;
   onError?: (error: string) => void;
-  onNewEntry?: () => void;
 }
 
-export function useHourNotes({ hour, entry, onSave, onError, onNewEntry }: UseHourNotesProps) {
+export function useHourNotes({ hour, entry, onSave, onError }: UseHourNotesProps) {
   const [content, setContent] = useState(entry?.content || "");
   const [isSaving, setIsSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
@@ -66,20 +65,12 @@ export function useHourNotes({ hour, entry, onSave, onError, onNewEntry }: UseHo
     }
 
     const currentContent = content;
-    const isNewEntry = currentContent.trim().length > 0;
-
-    // Save immediately on blur
     const success = await onSave(hour, currentContent);
     if (!success && onError) {
       onError("Failed to save. Please check your browser storage.");
       setSaveFailed(true);
     }
-
-    // Trigger streak animation
-    if (isNewEntry && onNewEntry) {
-      onNewEntry();
-    }
-  }, [content, hour, onSave, onError, onNewEntry]);
+  }, [content, hour, onSave, onError]);
 
   // Cleanup on unmount
   useEffect(() => {

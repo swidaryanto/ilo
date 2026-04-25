@@ -4,17 +4,15 @@ import * as React from "react";
 import { useEffect, useRef } from "react";
 import { useHourNotes } from "@/hooks/use-hour-notes";
 import { formatHour } from "@/lib/utils/date";
-import type { JournalEntry, Mood } from "@/lib/types/journal";
+import type { JournalEntry } from "@/lib/types/journal";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { StreakBadge } from "@/components/streak-badge";
-import { MoodSelector } from "@/components/mood-selector";
 import { IconAlertCircle } from "@tabler/icons-react";
 
 interface HourSectionProps {
   hour: number;
   entry: JournalEntry | undefined;
-  onSave: (hour: number, content: string, mood?: Mood) => Promise<boolean>;
+  onSave: (hour: number, content: string) => Promise<boolean>;
   onError?: (error: string) => void;
   isCurrentHour?: boolean;
   isFocused?: boolean;
@@ -23,10 +21,6 @@ interface HourSectionProps {
   onBlur?: () => void;
   onNavigateUp?: () => void;
   onNavigateDown?: () => void;
-  showStreakBadge?: boolean;
-  streakCount?: number;
-  onStreakAnimationComplete?: () => void;
-  onNewEntry?: (hour: number) => void;
 }
 
 export function HourSection({
@@ -41,41 +35,13 @@ export function HourSection({
   onBlur,
   onNavigateUp,
   onNavigateDown,
-  showStreakBadge = false,
-  streakCount = 0,
-  onStreakAnimationComplete,
-  onNewEntry,
 }: HourSectionProps) {
-  const [mood, setMood] = React.useState<Mood | undefined>(entry?.mood);
-  const moodRef = React.useRef(mood);
-
-  // Keep moodRef in sync with mood state
-  React.useEffect(() => {
-    moodRef.current = mood;
-  }, [mood]);
-
-  const { content, handleChange, handleBlur, isSaving, saveFailed } = useHourNotes({
+  const { content, handleChange, handleBlur, saveFailed } = useHourNotes({
     hour,
     entry,
-    onSave: (h, c) => onSave(h, c, moodRef.current),
+    onSave,
     onError,
-    onNewEntry: () => {
-      if (onNewEntry) {
-        onNewEntry(hour);
-      }
-    }
   });
-
-  // Sync mood with entry prop
-  React.useEffect(() => {
-    setMood(entry?.mood);
-  }, [entry?.mood]);
-
-  const handleMoodChange = (newMood: Mood | undefined) => {
-    setMood(newMood);
-    // Save with new mood
-    onSave(hour, content, newMood);
-  };
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -92,7 +58,6 @@ export function HourSection({
   const isBlurred = !isFocused && !isHovered;
   const hasContent = content && content.trim().length > 0;
   const shouldShowPlaceholder = isCurrentHour && !hasContent;
-  const showMoodSelector = isFocused || hasContent || mood;
 
   return (
     <div
@@ -112,15 +77,10 @@ export function HourSection({
             Save failed
           </span>
         )}
-        <StreakBadge
-          streak={streakCount}
-          show={showStreakBadge}
-          onAnimationComplete={onStreakAnimationComplete}
-        />
       </div>
 
       {/* Middle: Input */}
-      <div className="flex-1 flex flex-col md:flex-row md:items-start gap-1 md:gap-3">
+      <div className="flex-1">
         <Textarea
           ref={textareaRef}
           value={content || ""}
@@ -153,13 +113,6 @@ export function HourSection({
           )}
           rows={1}
         />
-        {showMoodSelector && (
-          <MoodSelector
-            selectedMood={mood}
-            onMoodSelect={handleMoodChange}
-            className="mt-1 md:mt-0 md:shrink-0"
-          />
-        )}
       </div>
     </div>
   );
