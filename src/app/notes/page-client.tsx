@@ -374,7 +374,7 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
         {/* Header Section */}
         <div className="shrink-0 pt-12 pb-4 px-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-[20px] md:text-[25px] font-normal italic tracking-tight font-[family-name:var(--font-instrument-serif)]">Ilo Journal</h1>
+            <h1 className="text-[16px] md:text-[22px] font-normal italic tracking-tight font-[family-name:var(--font-instrument-serif)]">Ilo Journal</h1>
 
             <div className="flex items-center gap-2">
               {/* Mode Selection Toggle */}

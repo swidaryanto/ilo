@@ -107,7 +107,7 @@ export default function TrashPage() {
             </Button>
           </Link>
           <div className="flex-1">
-            <h1 className="text-[20px] md:text-[25px] font-normal italic tracking-tight font-[family-name:var(--font-instrument-serif)]">
+            <h1 className="text-[16px] md:text-[22px] font-normal italic tracking-tight font-[family-name:var(--font-instrument-serif)]">
               Trash
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">
