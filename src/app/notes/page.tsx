@@ -30,7 +30,7 @@ export default function NotesPage() {
   const router = useRouter();
   const { addToast } = useToast();
   const { setTheme, theme } = useTheme();
-  const { storage, trashStorage, isLoading: storageLoading } = useStorage();
+  const { storage, trashStorage, isLoading: storageLoading, isAuthenticated } = useStorage();
   const isDark = theme === "dark";
   const [days, setDays] = useState<JournalDay[]>([]);
   const [loading, setLoading] = useState(true);
@@ -455,7 +455,9 @@ export default function NotesPage() {
                       <div className="px-2.5 py-1.5">
                         <div className="flex items-start gap-2 text-muted-foreground">
                           <IconInfoCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                          <span className="text-xs leading-relaxed">Entries save automatically as you type</span>
+                          <span className="text-xs leading-relaxed">
+                            {isAuthenticated ? "Entries will be saved to your Google Account" : "Entries save automatically as you type"}
+                          </span>
                         </div>
                       </div>
                     </div>
