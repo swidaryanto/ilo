@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Geist, Geist_Mono, Playwrite_NO } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 
@@ -14,10 +14,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const playwriteNo = Playwrite_NO({
-  variable: "--font-instrument-serif",
-  weight: ["100", "200", "300", "400"],
-});
 
 export const metadata: Metadata = {
   title: "Ilo",
@@ -49,7 +45,7 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wdth,wght@75..125,100..700&display=swap" rel="stylesheet" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playwriteNo.variable} antialiased max-w-xl mx-auto `}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-xl mx-auto `}
       >
         <ThemeProvider
           attribute="class"
