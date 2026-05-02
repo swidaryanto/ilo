@@ -66,7 +66,7 @@ export function HourSection({
       )}
     >
       {/* Left: Hour label */}
-      <div className="flex flex-col gap-2 min-w-[60px] items-start justify-center relative">
+      <div className="flex flex-col gap-2 min-w-[60px] items-start justify-start pt-1.5 relative">
         <span className="text-sm font-medium text-muted-foreground">
           {formatHour(hour)}
         </span>
