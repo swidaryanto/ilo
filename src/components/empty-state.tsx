@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { IconPencil, IconBook, IconArrowRight } from "@tabler/icons-react";
+import { IconArrowRight } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
@@ -10,28 +10,29 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export function EmptyState({ variant = "journal", onAction, className }: EmptyStateProps) {
+export function EmptyState({
+  variant = "journal",
+  onAction,
+  className,
+}: EmptyStateProps) {
   const isJournal = variant === "journal";
 
   return (
     <div
       className={cn(
         "flex flex-col items-center justify-center text-center px-6 py-12",
-        className
+        className,
       )}
     >
       {/* Illustration */}
       <div className="relative mb-6">
-        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-100 to-amber-50 dark:from-orange-950/30 dark:to-amber-900/20 flex items-center justify-center">
-          {isJournal ? (
-            <IconPencil className="w-8 h-8 text-orange-500 dark:text-orange-400" stroke={1.5} />
-          ) : (
-            <IconBook className="w-8 h-8 text-orange-500 dark:text-orange-400" stroke={1.5} />
-          )}
-        </div>
-        {/* Decorative dots */}
-        <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-orange-400/60" />
-        <div className="absolute -bottom-1 -left-1 w-2 h-2 rounded-full bg-amber-400/60" />
+        <img
+          src="/document.svg"
+          alt=""
+          aria-hidden="true"
+          className="w-15 h-15"
+          style={{ pointerEvents: "none" }}
+        />
       </div>
 
       {/* Title */}
@@ -50,7 +51,9 @@ export function EmptyState({ variant = "journal", onAction, className }: EmptySt
       <div
         className={cn(
           "flex items-center gap-2 text-xs font-medium",
-          isJournal ? "text-orange-500 dark:text-orange-400" : "text-muted-foreground"
+          isJournal
+            ? "text-orange-500 dark:text-orange-400"
+            : "text-muted-foreground",
         )}
       >
         {isJournal ? (
