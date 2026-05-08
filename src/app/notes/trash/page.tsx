@@ -6,7 +6,12 @@ import type { TrashItem } from "@/lib/storage/trash-storage";
 import { useStorage } from "@/hooks/use-storage";
 import { formatDateDisplay } from "@/lib/utils/date";
 import { Button } from "@/components/ui/button";
-import { IconTrash, IconRotate2, IconArrowLeft, IconAlertTriangle } from "@tabler/icons-react";
+import {
+  IconTrash,
+  IconRotate2,
+  IconArrowLeft,
+  IconAlertTriangle,
+} from "@tabler/icons-react";
 import { useToast } from "@/components/ui/toast";
 import { MoodBadge } from "@/components/mood-selector";
 import type { Mood } from "@/lib/types/journal";
@@ -33,7 +38,7 @@ export default function TrashPage() {
   }, [loadTrash]);
 
   const handleRestore = async (date: string) => {
-    const item = trashItems.find(i => i.day.date === date);
+    const item = trashItems.find((i) => i.day.date === date);
     if (!item) return;
 
     // Restore all entries from this day
@@ -111,10 +116,9 @@ export default function TrashPage() {
               Trash
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {trashItems.length === 0 
-                ? "No deleted entries" 
-                : `${trashItems.length} item${trashItems.length !== 1 ? 's' : ''} • Auto-deleted after 30 days`
-              }
+              {trashItems.length === 0
+                ? "No deleted entries"
+                : `${trashItems.length} item${trashItems.length !== 1 ? "s" : ""} • Auto-deleted after 30 days`}
             </p>
           </div>
           {trashItems.length > 0 && (
@@ -137,13 +141,13 @@ export default function TrashPage() {
           <div className="flex-1 flex flex-col items-center justify-center h-full text-center py-12">
             {/* Illustration */}
             <div className="relative mb-6">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-900/20 flex items-center justify-center">
-                <IconTrash className="w-8 h-8 text-blue-500 dark:text-blue-400" stroke={1.5} />
-              </div>
-              {/* Decorative elements */}
-              <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-blue-400/60" />
-              <div className="absolute -bottom-1 -left-1 w-2 h-2 rounded-full bg-cyan-400/60" />
-              <div className="absolute top-1/2 -right-3 w-1.5 h-1.5 rounded-full bg-sky-400/40" />
+              <img
+                src="/trash.svg"
+                alt=""
+                aria-hidden="true"
+                className="w-15 h-15"
+                style={{ pointerEvents: "none" }}
+              />
             </div>
 
             {/* Title */}
@@ -153,20 +157,25 @@ export default function TrashPage() {
 
             {/* Description */}
             <p className="text-sm text-muted-foreground max-w-[260px] leading-relaxed">
-              Deleted notes will appear here for 30 days before being permanently removed.
+              Deleted notes will appear here for 30 days before being
+              permanently removed.
             </p>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
             {trashItems.map((item) => {
               const daysLeft = getDaysUntilExpiry(item);
-              const uniqueMoods = [...new Set(item.day.entries.map(e => e.mood).filter(Boolean))] as Mood[];
-              const entryCount = item.day.entries.filter(e => e.content.trim().length > 0).length;
+              const uniqueMoods = [
+                ...new Set(item.day.entries.map((e) => e.mood).filter(Boolean)),
+              ] as Mood[];
+              const entryCount = item.day.entries.filter(
+                (e) => e.content.trim().length > 0,
+              ).length;
 
               return (
                 <div
                   key={item.day.date}
-                  className={`group flex items-center justify-between py-3 px-3 bg-background hover:bg-accent/35 relative rounded-[4px] transition-colors ${pendingDelete === item.day.date ? 'opacity-50' : ''}`}
+                  className={`group flex items-center justify-between py-3 px-3 bg-background hover:bg-accent/35 relative rounded-[4px] transition-colors ${pendingDelete === item.day.date ? "opacity-50" : ""}`}
                 >
                   <div className="flex-1 min-w-0">
                     <Link
@@ -184,14 +193,15 @@ export default function TrashPage() {
                         </span>
                       )}
                       <span className="text-xs text-muted-foreground">
-                        {entryCount} {entryCount === 1 ? 'entry' : 'entries'}
+                        {entryCount} {entryCount === 1 ? "entry" : "entries"}
                       </span>
                       <span className="text-xs text-muted-foreground">•</span>
-                      <span className={`text-xs ${daysLeft <= 7 ? 'text-orange-500' : 'text-muted-foreground'}`}>
-                        {daysLeft <= 7 
-                          ? `${daysLeft} day${daysLeft !== 1 ? 's' : ''} left` 
-                          : `Expires in ${daysLeft} days`
-                        }
+                      <span
+                        className={`text-xs ${daysLeft <= 7 ? "text-orange-500" : "text-muted-foreground"}`}
+                      >
+                        {daysLeft <= 7
+                          ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left`
+                          : `Expires in ${daysLeft} days`}
                       </span>
                     </div>
                   </div>
@@ -232,9 +242,12 @@ export default function TrashPage() {
                 <IconAlertTriangle className="h-5 w-5 text-destructive" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold mb-1">Permanently delete?</h3>
+                <h3 className="text-lg font-semibold mb-1">
+                  Permanently delete?
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                  This action cannot be undone. This entry will be permanently removed from your trash.
+                  This action cannot be undone. This entry will be permanently
+                  removed from your trash.
                 </p>
               </div>
             </div>
