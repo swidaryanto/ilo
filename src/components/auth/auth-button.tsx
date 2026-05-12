@@ -112,7 +112,7 @@ export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mob
         <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
           <div className="absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45" />
           <div className="relative z-10 font-[family-name:var(--font-sans)] select-none font-medium">
-            Save your journal to the cloud
+            Login to save your journal to the cloud.
           </div>
         </div>
       </div>
