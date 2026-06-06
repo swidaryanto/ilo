@@ -16,7 +16,7 @@ export function ConfirmDialog({
     isOpen,
     onClose,
     onConfirm,
-    title,
+    title: _title,
     description,
 }: ConfirmDialogProps) {
     const [isVisible, setIsVisible] = useState(false);

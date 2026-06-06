@@ -16,10 +16,8 @@ import { useToast } from "@/components/ui/toast";
 import { MoodBadge } from "@/components/mood-selector";
 import type { Mood } from "@/lib/types/journal";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export default function TrashPage() {
-  const router = useRouter();
   const { addToast } = useToast();
   const { trashStorage: storage } = useStorage();
   const [trashItems, setTrashItems] = useState<TrashItem[]>([]);

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { IconAlertCircle, IconCheck, IconX } from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
 export type ToastType = "error" | "success" | "info" | "warning";
@@ -87,13 +87,6 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
     }, toast.duration ?? 4000);
     return () => clearTimeout(timer);
   }, [onDismiss, toast.duration]);
-
-  const icons = {
-    error: <IconAlertCircle className="h-5 w-5 text-red-500" />,
-    success: <IconCheck className="h-5 w-5 text-green-500" />,
-    info: <IconAlertCircle className="h-5 w-5 text-blue-500" />,
-    warning: <IconAlertCircle className="h-5 w-5 text-muted-foreground" />,
-  };
 
   const bgColors = {
     error: "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800",

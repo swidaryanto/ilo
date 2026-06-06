@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 > **Read this file first.** This document captures the architecture, design decisions, and latest UI state of this project. Every AI agent or collaborator working on this repo should start here.
 

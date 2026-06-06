@@ -8,7 +8,6 @@ import { useStorage } from "@/hooks/use-storage";
 
 export function TrashButton() {
     const [trashCount, setTrashCount] = React.useState(0);
-    const [showTooltip, setShowTooltip] = React.useState(false);
     const { trashStorage } = useStorage();
 
     React.useEffect(() => {

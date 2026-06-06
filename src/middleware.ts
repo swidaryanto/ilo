@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export default auth((req: NextRequest & { auth: unknown }) => {
+export default auth((_req) => {
   return NextResponse.next();
 });
 
