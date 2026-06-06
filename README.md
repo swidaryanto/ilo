@@ -29,8 +29,3 @@ No setup. No accounts. Just open it and start writing.
 - Calendar view with entry indicators
 - Swipe-to-delete on mobile
 - Mood summary per day
-
-### Mobile Experience
-- Settings menu (⋯) for theme toggle
-- Responsive layout
-- Touch-friendly interactions
