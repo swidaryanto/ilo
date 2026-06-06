@@ -62,7 +62,7 @@ export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mob
       <div className="flex flex-col items-center gap-2">
         <div className="relative group">
           <Link
-            href="/"
+            href="/notes"
             className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 overflow-hidden hover:scale-110 hover:shadow-[0_0_0_3px_rgba(80,88,242,0.25)] active:scale-95 active:shadow-none"
             aria-label="Go to home"
           >
