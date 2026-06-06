@@ -1,11 +1,9 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
+import Link from "next/link";
+import { IconLogout2 } from "@tabler/icons-react";
 import { BrailleSpinner } from "@/components/ui/braille-spinner";
-
-function LogoutIcon() {
-  return <img src="/logout.svg" width={20} height={20} alt="" aria-hidden="true" style={{ pointerEvents: "none" }} />;
-}
 
 function EllipseIcon() {
   return (
@@ -52,30 +50,51 @@ export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mob
           type="button"
           onClick={() => signOut()}
           className="flex items-center gap-2 w-full px-2.5 py-2 rounded-md hover:bg-accent/50 transition-colors text-left"
-          aria-label="Logout"
+          aria-label="Sign out"
         >
-          <LogoutIcon />
-          <span className="text-sm text-foreground">Logout</span>
+          <IconLogout2 className="h-5 w-5 text-foreground/80" />
+          <span className="text-sm text-foreground">Sign out</span>
         </button>
       );
     }
 
     return (
-      <div className="relative group">
-        <button
-          type="button"
-          onClick={() => signOut()}
-          className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 overflow-hidden hover:scale-110 hover:shadow-[0_0_0_3px_rgba(80,88,242,0.25)] active:scale-95 active:shadow-none"
-          aria-label="Sign out"
-        >
-          <EllipseIcon />
-        </button>
-        {/* Tooltip */}
-        <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
-          <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
-            <div className="absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45" />
-            <div className="relative z-10 font-[family-name:var(--font-sans)] select-none font-medium">
-              Sign out
+      <div className="flex flex-col items-center gap-2">
+        <div className="relative group">
+          <Link
+            href="/"
+            className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 overflow-hidden hover:scale-110 hover:shadow-[0_0_0_3px_rgba(80,88,242,0.25)] active:scale-95 active:shadow-none"
+            aria-label="Go to home"
+          >
+            <EllipseIcon />
+          </Link>
+
+          <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
+            <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
+              <div className="absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45" />
+              <div className="relative z-10 font-[family-name:var(--font-sans)] select-none font-medium">
+                Go to home
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative group">
+          <button
+            type="button"
+            onClick={() => signOut()}
+            className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 hover:bg-accent/50 text-foreground/80 active:scale-95"
+            aria-label="Sign out from your account"
+          >
+            <IconLogout2 className="h-[1.15rem] w-[1.15rem]" />
+          </button>
+
+          <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
+            <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
+              <div className="absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45" />
+              <div className="relative z-10 font-[family-name:var(--font-sans)] select-none font-medium">
+                Sign out from your account
+              </div>
             </div>
           </div>
         </div>
