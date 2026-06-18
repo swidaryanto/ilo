@@ -1,4 +1,5 @@
 import type { JournalDay, JournalEntry } from "@/lib/types/journal";
+
 import type { TrashStorageInterface } from "./trash-storage-interface";
 
 const TRASH_KEY = "journal:trash";
@@ -32,8 +33,8 @@ export class TrashStorage implements TrashStorageInterface {
 
       const items: TrashItem[] = JSON.parse(data);
       // Filter out expired items
-      const validItems = items.filter(item => !isExpired(item));
-      
+      const validItems = items.filter((item) => !isExpired(item));
+
       // Persist the cleanup
       if (validItems.length !== items.length) {
         await this.saveTrashItems(validItems);
@@ -67,7 +68,7 @@ export class TrashStorage implements TrashStorageInterface {
     }
 
     const items = await this.getTrashItems();
-    const itemIndex = items.findIndex(item => item.day.date === date);
+    const itemIndex = items.findIndex((item) => item.day.date === date);
 
     if (itemIndex === -1) return null;
 
@@ -84,7 +85,7 @@ export class TrashStorage implements TrashStorageInterface {
     }
 
     const items = await this.getTrashItems();
-    const filtered = items.filter(item => item.day.date !== date);
+    const filtered = items.filter((item) => item.day.date !== date);
     await this.saveTrashItems(filtered);
   }
 
@@ -116,9 +117,11 @@ export class TrashStorage implements TrashStorageInterface {
 
     const key = `journal:${entry.date}`;
     const existingData = localStorage.getItem(key);
-    const existingEntries: JournalEntry[] = existingData ? JSON.parse(existingData) : [];
+    const existingEntries: JournalEntry[] = existingData
+      ? JSON.parse(existingData)
+      : [];
 
-    const exists = existingEntries.some(e => e.id === entry.id);
+    const exists = existingEntries.some((e) => e.id === entry.id);
     if (!exists) {
       existingEntries.push(entry);
       existingEntries.sort((a, b) => a.hour - b.hour);

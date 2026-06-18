@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { formatDate } from "@/lib/utils/date";
+
 import { useStorage } from "@/hooks/use-storage";
+import { formatDate } from "@/lib/utils/date";
 
 interface StreakData {
   currentStreak: number;
@@ -49,7 +50,10 @@ export function useStreak() {
       let hasShownCelebration = false;
       if (celebrationData) {
         try {
-          const parsed = JSON.parse(celebrationData) as { date: string; shown: boolean };
+          const parsed = JSON.parse(celebrationData) as {
+            date: string;
+            shown: boolean;
+          };
           if (parsed.date === today) {
             hasShownCelebration = parsed.shown;
           }
@@ -59,7 +63,8 @@ export function useStreak() {
       }
 
       const todayEntries = allDays.find((day) => day.date === today);
-      const hasEntriesToday = todayEntries?.entries.some((e) => e.content.trim().length > 0) ?? false;
+      const hasEntriesToday =
+        todayEntries?.entries.some((e) => e.content.trim().length > 0) ?? false;
       const isFirstEntryToday = !hasEntriesToday && !hasShownCelebration;
 
       setStreakData({ currentStreak, isFirstEntryToday, hasShownCelebration });
@@ -71,7 +76,10 @@ export function useStreak() {
 
   const markCelebrationShown = useCallback(() => {
     const today = formatDate(new Date());
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: today, shown: true }));
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ date: today, shown: true })
+    );
     setStreakData((prev) => ({
       ...prev,
       hasShownCelebration: true,

@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useHourNotes } from "@/hooks/use-hour-notes";
-import { formatHour } from "@/lib/utils/date";
-import type { JournalEntry } from "@/lib/types/journal";
-import { cn } from "@/lib/utils";
 import { IconAlertCircle } from "@tabler/icons-react";
+import { useEffect, useRef } from "react";
+
+import type { JournalEntry } from "@/lib/types/journal";
+
+import { useHourNotes } from "@/hooks/use-hour-notes";
+import { cn } from "@/lib/utils";
+import { formatHour } from "@/lib/utils/date";
 
 interface HourSectionProps {
   hour: number;
@@ -34,7 +36,12 @@ export function HourSection({
   onNavigateUp,
   onNavigateDown,
 }: HourSectionProps) {
-  const { initialContent, handleBlur } = useHourNotes({ hour, entry, onSave, onError });
+  const { initialContent, handleBlur } = useHourNotes({
+    hour,
+    entry,
+    onSave,
+    onError,
+  });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const saveFailed = useRef(false);
 
@@ -98,14 +105,19 @@ export function HourSection({
             const textarea = e.currentTarget;
             const pos = textarea.selectionStart || 0;
             const lines = textarea.value.split("\n");
-            const currentLine = textarea.value.substring(0, pos).split("\n").length - 1;
+            const currentLine =
+              textarea.value.substring(0, pos).split("\n").length - 1;
             const isAtStart = pos === 0;
             const isAtEnd = pos === textarea.value.length;
 
             if (e.key === "ArrowUp" && currentLine === 0 && isAtStart) {
               e.preventDefault();
               onNavigateUp?.();
-            } else if (e.key === "ArrowDown" && currentLine === lines.length - 1 && isAtEnd) {
+            } else if (
+              e.key === "ArrowDown" &&
+              currentLine === lines.length - 1 &&
+              isAtEnd
+            ) {
               e.preventDefault();
               onNavigateDown?.();
             }

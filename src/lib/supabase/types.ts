@@ -1,4 +1,10 @@
-export type Mood = "happy" | "sad" | "frustrated" | "tired" | "excited" | "calm";
+export type Mood =
+  | "happy"
+  | "sad"
+  | "frustrated"
+  | "tired"
+  | "excited"
+  | "calm";
 
 export type Database = {
   public: {

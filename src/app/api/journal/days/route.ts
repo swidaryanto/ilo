@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+
+import type { JournalDay, JournalEntry, Mood } from "@/lib/types/journal";
+
 import { getRequiredSession } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { JournalDay, JournalEntry, Mood } from "@/lib/types/journal";
 
 type EntryRow = {
   id: string;

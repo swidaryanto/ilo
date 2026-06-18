@@ -1,7 +1,8 @@
-import { auth } from "@/auth";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { JournalPage } from "@/components/journal/journal-page";
 import type { JournalEntry } from "@/lib/types/journal";
+
+import { auth } from "@/auth";
+import { JournalPage } from "@/components/journal/journal-page";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils/date";
 
 export default async function Home() {

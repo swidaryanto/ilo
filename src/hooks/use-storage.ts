@@ -2,9 +2,14 @@
 
 import { useSession } from "next-auth/react";
 import { useMemo } from "react";
-import { getJournalStorage, getTrashStorage } from "@/lib/storage/storage-factory";
+
 import type { JournalStorage } from "@/lib/storage/journal-storage";
 import type { TrashStorageInterface } from "@/lib/storage/trash-storage-interface";
+
+import {
+  getJournalStorage,
+  getTrashStorage,
+} from "@/lib/storage/storage-factory";
 
 export function useStorage(): {
   storage: JournalStorage;

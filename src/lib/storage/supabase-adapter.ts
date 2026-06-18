@@ -1,5 +1,6 @@
-import type { JournalStorage } from "./journal-storage";
 import type { JournalEntry, JournalDay } from "@/lib/types/journal";
+
+import type { JournalStorage } from "./journal-storage";
 
 export class SupabaseAdapter implements JournalStorage {
   async getEntries(date: string): Promise<JournalEntry[]> {

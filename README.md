@@ -4,7 +4,15 @@ A time-based journal for people who think in hours, not pages.
 
 Ilo organizes your notes by the hour of the day — so instead of scrolling through
 a wall of text, you can find exactly what you were thinking at 9am, 3pm, or midnight.
-No setup. No accounts. Just open it and start writing.
+Open it and start writing — no account required. Sign in with Google to sync your journal to the cloud.
+
+## Setup
+
+```bash
+npm install
+cp .env.example .env.local   # fill in Supabase + Google OAuth credentials
+npm run dev
+```
 
 ## What it does
 

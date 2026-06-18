@@ -1,6 +1,7 @@
-import type { TrashStorageInterface } from "./trash-storage-interface";
-import type { TrashItem } from "./trash-storage";
 import type { JournalDay, JournalEntry } from "@/lib/types/journal";
+
+import type { TrashItem } from "./trash-storage";
+import type { TrashStorageInterface } from "./trash-storage-interface";
 
 export class SupabaseTrashStorage implements TrashStorageInterface {
   async getTrashItems(): Promise<TrashItem[]> {

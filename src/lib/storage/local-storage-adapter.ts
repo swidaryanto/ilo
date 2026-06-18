@@ -1,4 +1,5 @@
 import type { JournalEntry, JournalDay } from "@/lib/types/journal";
+
 import type { JournalStorage } from "./journal-storage";
 
 const STORAGE_PREFIX = "journal:";
@@ -13,7 +14,7 @@ function getStorageKey(date: string): string {
  */
 function isLocalStorageAvailable(): boolean {
   if (typeof window === "undefined") return false;
-  
+
   try {
     const testKey = "__storage_test__";
     localStorage.setItem(testKey, testKey);
@@ -32,7 +33,9 @@ function isLocalStorageQuotaExceeded(error: unknown): boolean {
     return error.name === "QuotaExceededError";
   }
   if (error instanceof Error) {
-    return error.message.includes("quota") || error.message.includes("exceeded");
+    return (
+      error.message.includes("quota") || error.message.includes("exceeded")
+    );
   }
   return false;
 }
@@ -44,7 +47,9 @@ export class LocalStorageAdapter implements JournalStorage {
     }
 
     if (!isLocalStorageAvailable()) {
-      throw new Error("LocalStorage is not available. Your data cannot be loaded.");
+      throw new Error(
+        "LocalStorage is not available. Your data cannot be loaded."
+      );
     }
 
     const key = getStorageKey(date);
@@ -68,7 +73,9 @@ export class LocalStorageAdapter implements JournalStorage {
     }
 
     if (!isLocalStorageAvailable()) {
-      throw new Error("LocalStorage is not available. Your entries cannot be saved.");
+      throw new Error(
+        "LocalStorage is not available. Your entries cannot be saved."
+      );
     }
 
     const key = getStorageKey(entry.date);
@@ -86,9 +93,13 @@ export class LocalStorageAdapter implements JournalStorage {
       localStorage.setItem(key, JSON.stringify(existingEntries));
     } catch (error) {
       if (isLocalStorageQuotaExceeded(error)) {
-        throw new Error("Storage quota exceeded. Please delete some entries to free up space.");
+        throw new Error(
+          "Storage quota exceeded. Please delete some entries to free up space."
+        );
       }
-      throw new Error("Failed to save entry. Please check your browser settings.");
+      throw new Error(
+        "Failed to save entry. Please check your browser settings."
+      );
     }
   }
 
@@ -188,4 +199,3 @@ export class LocalStorageAdapter implements JournalStorage {
     return days.sort((a, b) => b.date.localeCompare(a.date));
   }
 }
-

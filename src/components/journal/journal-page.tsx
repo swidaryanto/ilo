@@ -1,16 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useJournal } from "@/hooks/use-journal";
-import { HourSection } from "./hour-section";
-import { formatDate, formatDateDisplay } from "@/lib/utils/date";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { useToast } from "@/components/ui/toast";
-import { EmptyState } from "@/components/empty-state";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export function JournalPage({ initialEntries }: { initialEntries?: import("@/lib/types/journal").JournalEntry[] }) {
+import { EmptyState } from "@/components/empty-state";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/components/ui/toast";
+import { useJournal } from "@/hooks/use-journal";
+import { formatDate, formatDateDisplay } from "@/lib/utils/date";
+
+import { HourSection } from "./hour-section";
+
+export function JournalPage({
+  initialEntries,
+}: {
+  initialEntries?: import("@/lib/types/journal").JournalEntry[];
+}) {
   const currentDate = formatDate(new Date());
   const { addToast } = useToast();
   const {
@@ -42,11 +48,19 @@ export function JournalPage({ initialEntries }: { initialEntries?: import("@/lib
   }, [currentHour, loading]);
 
   if (loading) {
-    const quotes = ["Write it down.", "Words heal you.", "Begin right now.", "Tell your truth.", "Just keep writing."];
+    const quotes = [
+      "Write it down.",
+      "Words heal you.",
+      "Begin right now.",
+      "Tell your truth.",
+      "Just keep writing.",
+    ];
     const quote = quotes[Math.floor(Math.random() * quotes.length)];
     return (
       <div className="flex flex-col items-center justify-center h-screen px-10 gap-3">
-        <p className="text-center text-muted-foreground text-sm italic">&ldquo;{quote}&rdquo;</p>
+        <p className="text-center text-muted-foreground text-sm italic">
+          &ldquo;{quote}&rdquo;
+        </p>
       </div>
     );
   }
@@ -78,7 +92,10 @@ export function JournalPage({ initialEntries }: { initialEntries?: import("@/lib
         <div className="flex flex-col gap-2 px-6 pb-6">
           {!hasEntries && (
             <div className="py-8">
-              <EmptyState variant="journal" onAction={() => setFocusedHour(currentHour)} />
+              <EmptyState
+                variant="journal"
+                onAction={() => setFocusedHour(currentHour)}
+              />
             </div>
           )}
 
@@ -87,18 +104,25 @@ export function JournalPage({ initialEntries }: { initialEntries?: import("@/lib
             return (
               <div
                 key={hour}
-                onMouseEnter={() => focusedHour !== hour && setHoveredHour(hour)}
+                onMouseEnter={() =>
+                  focusedHour !== hour && setHoveredHour(hour)
+                }
                 onMouseLeave={() => setHoveredHour(null)}
               >
                 <HourSection
                   hour={hour}
                   entry={getEntryForHour(hour)}
                   onSave={saveEntry}
-                  onError={(message) => addToast({ message, type: "error", duration: 5000 })}
+                  onError={(message) =>
+                    addToast({ message, type: "error", duration: 5000 })
+                  }
                   isCurrentHour={hour === currentHour}
                   isFocused={focusedHour === hour}
                   isHovered={hoveredHour === hour}
-                  onFocus={() => { setFocusedHour(hour); setHoveredHour(null); }}
+                  onFocus={() => {
+                    setFocusedHour(hour);
+                    setHoveredHour(null);
+                  }}
                   onBlur={() => {}}
                   onNavigateUp={() => hour > 0 && setFocusedHour(hour - 1)}
                   onNavigateDown={() => hour < 23 && setFocusedHour(hour + 1)}

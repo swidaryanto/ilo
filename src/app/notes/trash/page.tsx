@@ -1,21 +1,23 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { BrailleLoader } from "@/components/ui/braille-spinner";
-import type { TrashItem } from "@/lib/storage/trash-storage";
-import { useStorage } from "@/hooks/use-storage";
-import { formatDateDisplay } from "@/lib/utils/date";
-import { Button } from "@/components/ui/button";
 import {
   IconTrash,
   IconRotate2,
   IconArrowLeft,
   IconAlertTriangle,
 } from "@tabler/icons-react";
-import { useToast } from "@/components/ui/toast";
-import { MoodBadge } from "@/components/mood-selector";
-import type { Mood } from "@/lib/types/journal";
 import Link from "next/link";
+import { useEffect, useState, useCallback } from "react";
+
+import type { TrashItem } from "@/lib/storage/trash-storage";
+import type { Mood } from "@/lib/types/journal";
+
+import { MoodBadge } from "@/components/mood-selector";
+import { BrailleLoader } from "@/components/ui/braille-spinner";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
+import { useStorage } from "@/hooks/use-storage";
+import { formatDateDisplay } from "@/lib/utils/date";
 
 export default function TrashPage() {
   const { addToast } = useToast();
@@ -167,7 +169,7 @@ export default function TrashPage() {
                 ...new Set(item.day.entries.map((e) => e.mood).filter(Boolean)),
               ] as Mood[];
               const entryCount = item.day.entries.filter(
-                (e) => e.content.trim().length > 0,
+                (e) => e.content.trim().length > 0
               ).length;
 
               return (

@@ -22,7 +22,7 @@ npm run check    # Run both lint and format
 
 **Live:** `https://ilo-2heifeh5d-swidaryantos-projects.vercel.app`
 **Repo:** `github.com/swidaryanto/ilo`
-**Stack:** Next.js 16 · React 19 · Tailwind CSS 4 · TypeScript · localStorage
+**Stack:** Next.js 16 · React 19 · Tailwind CSS 4 · TypeScript · localStorage + Supabase
 
 ---
 
@@ -30,12 +30,19 @@ npm run check    # Run both lint and format
 
 ### Storage Layer
 
-Uses a storage adapter pattern designed for future database migration:
+Uses a storage adapter pattern with runtime selection via `storage-factory.ts`:
 
 - `src/lib/storage/journal-storage.ts` — Interface (`JournalStorage`)
-- `src/lib/storage/local-storage-adapter.ts` — localStorage impl, keys: `journal:YYYY-MM-DD`
+- `src/lib/storage/local-storage-adapter.ts` — localStorage impl, keys: `journal:YYYY-MM-DD` (guest users)
+- `src/lib/storage/supabase-adapter.ts` — Supabase backend (authenticated users)
+- `src/lib/storage/storage-factory.ts` — `getJournalStorage(isAuthenticated)` picks the adapter
 
-To add a new backend: implement `JournalStorage` and swap the adapter in `use-journal.ts`.
+To add a new backend: implement `JournalStorage` and register it in `storage-factory.ts`.
+
+### Auth
+
+- NextAuth v5 with Google provider (`src/auth.ts`)
+- Env vars: see `.env.example`
 
 ### Data Flow
 
@@ -55,7 +62,7 @@ To add a new backend: implement `JournalStorage` and swap the adapter in `use-jo
 
 - Entry IDs: `{date}-{hour}` (e.g. `2024-01-15-14`)
 - Date format: `YYYY-MM-DD` strings throughout
-- All components are `"use client"` — localStorage dependency
+- Client components use `useStorage` hook — adapter switches between localStorage and Supabase based on auth state
 - Arrow key navigation between hours at text boundaries
 
 ---

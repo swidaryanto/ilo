@@ -1,13 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server";
+
+import type { TrashItem } from "@/lib/storage/trash-storage";
+import type { JournalDay, JournalEntry, Mood } from "@/lib/types/journal";
+
 import { getRequiredSession } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { JournalDay, JournalEntry, Mood } from "@/lib/types/journal";
-import type { TrashItem } from "@/lib/storage/trash-storage";
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getRequiredSession();
-    const body = (await req.json()) as { days: JournalDay[]; trash: TrashItem[] };
+    const body = (await req.json()) as {
+      days: JournalDay[];
+      trash: TrashItem[];
+    };
     const db = createServerSupabaseClient();
     const userId = session.user.id;
 

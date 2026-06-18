@@ -14,21 +14,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-
 export const metadata: Metadata = {
   title: "Ilo",
   description: "A minimal journal for your thoughts",
 };
 
+import { auth } from "@/auth";
+import { AuthButton } from "@/components/auth/auth-button";
+import { SessionProvider } from "@/components/auth/session-provider";
+import { ExportButton } from "@/components/export-button";
+import { MigrationBanner } from "@/components/migration-banner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { ExportButton } from "@/components/export-button";
 import { TrashButton } from "@/components/trash-button";
 import { ToastProvider } from "@/components/ui/toast";
-import { SessionProvider } from "@/components/auth/session-provider";
-import { AuthButton } from "@/components/auth/auth-button";
-import { MigrationBanner } from "@/components/migration-banner";
-import { auth } from "@/auth";
 
 export default async function RootLayout({
   children,
@@ -41,8 +40,15 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wdth,wght@75..125,100..700&display=swap" rel="stylesheet" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wdth,wght@75..125,100..700&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-xl mx-auto `}
@@ -73,4 +79,3 @@ export default async function RootLayout({
     </html>
   );
 }
-

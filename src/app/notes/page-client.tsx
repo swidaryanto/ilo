@@ -1,34 +1,55 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
-import { BrailleLoader } from "@/components/ui/braille-spinner";
-import type { JournalDay } from "@/lib/types/journal";
-import { useStorage } from "@/hooks/use-storage";
+import {
+  IconTrash,
+  IconList,
+  IconLayoutGrid,
+  IconDotsVertical,
+  IconSun,
+  IconMoon,
+  IconInfoCircle,
+} from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
-import { formatDate, formatDateDisplay, formatDateShortDisplay } from "@/lib/utils/date";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { IconTrash, IconList, IconLayoutGrid, IconDotsVertical, IconSun, IconMoon, IconInfoCircle } from "@tabler/icons-react";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useTheme } from "next-themes";
-import { EmptyState } from "@/components/empty-state";
-import { MoodBadge } from "@/components/mood-selector";
-import { useToast } from "@/components/ui/toast";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useCallback, useState } from "react";
+import React from "react";
+
+import type { JournalDay } from "@/lib/types/journal";
 import type { Mood } from "@/lib/types/journal";
 import type { JournalEntry } from "@/lib/types/journal";
-import Link from "next/link";
-import { AuthButton } from "@/components/auth/auth-button";
 
-import { useRouter } from "next/navigation";
-import React from "react";
+import { AuthButton } from "@/components/auth/auth-button";
+import { EmptyState } from "@/components/empty-state";
+import { MoodBadge } from "@/components/mood-selector";
+import { BrailleLoader } from "@/components/ui/braille-spinner";
+import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/components/ui/toast";
+import { useStorage } from "@/hooks/use-storage";
+import {
+  formatDate,
+  formatDateDisplay,
+  formatDateShortDisplay,
+} from "@/lib/utils/date";
 
 const SWIPE_ACTION_WIDTH = 80;
 const SWIPE_THRESHOLD = 40;
 const VELOCITY_THRESHOLD = 0.4;
 const DEAD_ZONE = 10;
 
-export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] }) {
+export default function NotesPage({
+  initialDays,
+}: {
+  initialDays?: JournalDay[];
+}) {
   const router = useRouter();
   const { addToast } = useToast();
   const { setTheme, theme } = useTheme();
@@ -38,9 +59,15 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
   const [days, setDays] = useState<JournalDay[]>(initialDays ?? []);
   const [loading, setLoading] = useState(!initialDays);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedDateToDelete, setSelectedDateToDelete] = useState<string | null>(null);
+  const [selectedDateToDelete, setSelectedDateToDelete] = useState<
+    string | null
+  >(null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
-  const [pendingDeletion, setPendingDeletion] = useState<{ date: string; entries: JournalEntry[]; timeoutId: NodeJS.Timeout } | null>(null);
+  const [pendingDeletion, setPendingDeletion] = useState<{
+    date: string;
+    entries: JournalEntry[];
+    timeoutId: NodeJS.Timeout;
+  } | null>(null);
   const [trashCount, setTrashCount] = useState(0);
   const hintRef = useRef<HTMLSpanElement>(null);
   const linkRef = useRef<HTMLAnchorElement>(null);
@@ -69,8 +96,8 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
     setLoading(true);
     try {
       const allDays = await storage.getAllDays();
-      const filteredDays = allDays.filter(day =>
-        day.entries.some(entry => entry.content.trim().length > 0)
+      const filteredDays = allDays.filter((day) =>
+        day.entries.some((entry) => entry.content.trim().length > 0)
       );
       setDays(filteredDays);
     } catch (error) {
@@ -100,21 +127,24 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
 
     // Phase 1: after 1.5s, crossfade "Resume Journal" → "Swipe left to delete"
     const t1 = setTimeout(() => {
-      link.style.opacity = '0';
-      link.style.transform = 'translateY(-8px)';
-      hint.style.opacity = '1';
-      hint.style.transform = 'translateY(0)';
+      link.style.opacity = "0";
+      link.style.transform = "translateY(-8px)";
+      hint.style.opacity = "1";
+      hint.style.transform = "translateY(0)";
     }, 1500);
 
     // Phase 2: after 4.5s, crossfade back
     const t2 = setTimeout(() => {
-      link.style.opacity = '1';
-      link.style.transform = 'translateY(0)';
-      hint.style.opacity = '0';
-      hint.style.transform = 'translateY(8px)';
+      link.style.opacity = "1";
+      link.style.transform = "translateY(0)";
+      hint.style.opacity = "0";
+      hint.style.transform = "translateY(8px)";
     }, 4500);
 
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [loading]);
 
   const handleDeleteClick = (e: React.MouseEvent, date: string) => {
@@ -124,7 +154,7 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
   };
 
   const startPendingDeletion = async (date: string) => {
-    const dayToDelete = days.find(d => d.date === date);
+    const dayToDelete = days.find((d) => d.date === date);
     if (!dayToDelete) return;
 
     // Move to trash immediately
@@ -134,7 +164,9 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
     await storage.deleteDay(date);
 
     // Show toast with undo
-    const entriesWithContent = dayToDelete.entries.filter(e => e.content.trim().length > 0);
+    const entriesWithContent = dayToDelete.entries.filter(
+      (e) => e.content.trim().length > 0
+    );
     const entryCount = entriesWithContent.length;
     const entryWord = entryCount === 1 ? "entry" : "entries";
 
@@ -190,35 +222,42 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
   // Show/hide the red background for a given date
   const showBg = useCallback((date: string) => {
     const bg = bgRefs.current[date];
-    if (bg) bg.style.visibility = 'visible';
+    if (bg) bg.style.visibility = "visible";
   }, []);
 
   const hideBg = useCallback((date: string) => {
     const bg = bgRefs.current[date];
-    if (bg) bg.style.visibility = 'hidden';
+    if (bg) bg.style.visibility = "hidden";
   }, []);
 
   // Animate an element's transform with spring-like easing
-  const animateSwipe = useCallback((el: HTMLDivElement, targetX: number, onDone?: () => void) => {
-    el.style.transition = 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-    el.style.transform = `translateX(${targetX}px)`;
-    const handler = () => {
-      el.style.transition = '';
-      el.removeEventListener('transitionend', handler);
-      onDone?.();
-    };
-    el.addEventListener('transitionend', handler);
-  }, []);
+  const animateSwipe = useCallback(
+    (el: HTMLDivElement, targetX: number, onDone?: () => void) => {
+      el.style.transition =
+        "transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+      el.style.transform = `translateX(${targetX}px)`;
+      const handler = () => {
+        el.style.transition = "";
+        el.removeEventListener("transitionend", handler);
+        onDone?.();
+      };
+      el.addEventListener("transitionend", handler);
+    },
+    []
+  );
 
   // Close any previously open swipe
-  const closeOpenSwipe = useCallback((exceptDate?: string) => {
-    const prev = openSwipeDate.current;
-    if (prev && prev !== exceptDate) {
-      const el = swipeRefs.current[prev];
-      if (el) animateSwipe(el, 0, () => hideBg(prev));
-      openSwipeDate.current = null;
-    }
-  }, [animateSwipe, hideBg]);
+  const closeOpenSwipe = useCallback(
+    (exceptDate?: string) => {
+      const prev = openSwipeDate.current;
+      if (prev && prev !== exceptDate) {
+        const el = swipeRefs.current[prev];
+        if (el) animateSwipe(el, 0, () => hideBg(prev));
+        openSwipeDate.current = null;
+      }
+    },
+    [animateSwipe, hideBg]
+  );
 
   const onTouchStart = useCallback((e: React.TouchEvent, date: string) => {
     const touch = e.touches[0];
@@ -234,98 +273,108 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
     };
   }, []);
 
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    const swipe = activeSwipe.current;
-    if (!swipe) return;
+  const onTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      const swipe = activeSwipe.current;
+      if (!swipe) return;
 
-    const touch = e.touches[0];
-    const dx = touch.clientX - swipe.startX;
-    const dy = touch.clientY - swipe.startY;
+      const touch = e.touches[0];
+      const dx = touch.clientX - swipe.startX;
+      const dy = touch.clientY - swipe.startY;
 
-    // Decide direction lock within the dead zone
-    if (swipe.locked === null) {
-      if (Math.abs(dx) < DEAD_ZONE && Math.abs(dy) < DEAD_ZONE) return;
-      swipe.locked = Math.abs(dx) > Math.abs(dy);
-      if (!swipe.locked) {
-        // Vertical scroll — bail out
-        activeSwipe.current = null;
-        return;
+      // Decide direction lock within the dead zone
+      if (swipe.locked === null) {
+        if (Math.abs(dx) < DEAD_ZONE && Math.abs(dy) < DEAD_ZONE) return;
+        swipe.locked = Math.abs(dx) > Math.abs(dy);
+        if (!swipe.locked) {
+          // Vertical scroll — bail out
+          activeSwipe.current = null;
+          return;
+        }
+        // Close any other open swipe when starting a new one
+        closeOpenSwipe(swipe.date);
+        // Show the red background for this item
+        showBg(swipe.date);
       }
-      // Close any other open swipe when starting a new one
-      closeOpenSwipe(swipe.date);
-      // Show the red background for this item
-      showBg(swipe.date);
-    }
 
-    // Track velocity
-    swipe.lastX = touch.clientX;
-    swipe.lastTime = Date.now();
+      // Track velocity
+      swipe.lastX = touch.clientX;
+      swipe.lastTime = Date.now();
 
-    const el = swipeRefs.current[swipe.date];
-    if (!el) return;
+      const el = swipeRefs.current[swipe.date];
+      if (!el) return;
 
-    // Calculate offset: negative = swiped left
-    const isAlreadyOpen = openSwipeDate.current === swipe.date;
-    const baseOffset = isAlreadyOpen ? -SWIPE_ACTION_WIDTH : 0;
-    let offset = baseOffset + dx;
+      // Calculate offset: negative = swiped left
+      const isAlreadyOpen = openSwipeDate.current === swipe.date;
+      const baseOffset = isAlreadyOpen ? -SWIPE_ACTION_WIDTH : 0;
+      let offset = baseOffset + dx;
 
-    // Clamp: don't allow right swipe past 0
-    if (offset > 0) offset = 0;
+      // Clamp: don't allow right swipe past 0
+      if (offset > 0) offset = 0;
 
-    // Rubber-band resistance past the action width
-    if (offset < -SWIPE_ACTION_WIDTH) {
-      const over = -offset - SWIPE_ACTION_WIDTH;
-      offset = -(SWIPE_ACTION_WIDTH + over * 0.3);
-    }
+      // Rubber-band resistance past the action width
+      if (offset < -SWIPE_ACTION_WIDTH) {
+        const over = -offset - SWIPE_ACTION_WIDTH;
+        offset = -(SWIPE_ACTION_WIDTH + over * 0.3);
+      }
 
-    el.style.transition = 'none';
-    el.style.transform = `translateX(${offset}px)`;
-    swipe.currentX = touch.clientX;
-  }, [closeOpenSwipe, showBg]);
+      el.style.transition = "none";
+      el.style.transform = `translateX(${offset}px)`;
+      swipe.currentX = touch.clientX;
+    },
+    [closeOpenSwipe, showBg]
+  );
 
-  const onTouchEnd = useCallback((date: string) => {
-    const swipe = activeSwipe.current;
-    activeSwipe.current = null;
-    if (!swipe || swipe.locked !== true) return;
+  const onTouchEnd = useCallback(
+    (date: string) => {
+      const swipe = activeSwipe.current;
+      activeSwipe.current = null;
+      if (!swipe || swipe.locked !== true) return;
 
-    const el = swipeRefs.current[date];
-    if (!el) return;
+      const el = swipeRefs.current[date];
+      if (!el) return;
 
-    const dx = swipe.currentX - swipe.startX;
-    const dt = Math.max(1, swipe.lastTime - swipe.startTime);
-    const velocity = Math.abs(dx) / dt; // px/ms
-    const isAlreadyOpen = openSwipeDate.current === date;
-    const totalOffset = (isAlreadyOpen ? -SWIPE_ACTION_WIDTH : 0) + dx;
+      const dx = swipe.currentX - swipe.startX;
+      const dt = Math.max(1, swipe.lastTime - swipe.startTime);
+      const velocity = Math.abs(dx) / dt; // px/ms
+      const isAlreadyOpen = openSwipeDate.current === date;
+      const totalOffset = (isAlreadyOpen ? -SWIPE_ACTION_WIDTH : 0) + dx;
 
-    // Fast flick left or past threshold = open/trigger
-    const shouldOpen = totalOffset < -SWIPE_THRESHOLD || (velocity > VELOCITY_THRESHOLD && dx < 0);
-    // Fast flick right or within threshold = close
-    const shouldClose = !shouldOpen || (velocity > VELOCITY_THRESHOLD && dx > 0);
+      // Fast flick left or past threshold = open/trigger
+      const shouldOpen =
+        totalOffset < -SWIPE_THRESHOLD ||
+        (velocity > VELOCITY_THRESHOLD && dx < 0);
+      // Fast flick right or within threshold = close
+      const shouldClose =
+        !shouldOpen || (velocity > VELOCITY_THRESHOLD && dx > 0);
 
-    if (shouldOpen && !shouldClose) {
-      // If swiped well past the action width with velocity, auto-trigger delete
-      if (totalOffset < -(SWIPE_ACTION_WIDTH * 1.2) || (velocity > 0.8 && dx < -SWIPE_ACTION_WIDTH)) {
-        animateSwipe(el, 0, () => {
-          openSwipeDate.current = null;
-          hideBg(date);
-        });
-        startPendingDeletion(date);
+      if (shouldOpen && !shouldClose) {
+        // If swiped well past the action width with velocity, auto-trigger delete
+        if (
+          totalOffset < -(SWIPE_ACTION_WIDTH * 1.2) ||
+          (velocity > 0.8 && dx < -SWIPE_ACTION_WIDTH)
+        ) {
+          animateSwipe(el, 0, () => {
+            openSwipeDate.current = null;
+            hideBg(date);
+          });
+          startPendingDeletion(date);
+        } else {
+          // Snap to open position
+          animateSwipe(el, -SWIPE_ACTION_WIDTH);
+          openSwipeDate.current = date;
+        }
       } else {
-        // Snap to open position
-        animateSwipe(el, -SWIPE_ACTION_WIDTH);
-        openSwipeDate.current = date;
+        // Snap closed
+        animateSwipe(el, 0, () => hideBg(date));
+        openSwipeDate.current = null;
       }
-    } else {
-      // Snap closed
-      animateSwipe(el, 0, () => hideBg(date));
-      openSwipeDate.current = null;
-    }
-  }, [animateSwipe, hideBg, startPendingDeletion]);
+    },
+    [animateSwipe, hideBg, startPendingDeletion]
+  );
 
   if (loading) {
-    return (
-      <BrailleLoader />
-    );
+    return <BrailleLoader />;
   }
 
   // Calendar View Component
@@ -334,19 +383,22 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
       <div className="grid grid-cols-7 sm:grid-cols-9 md:grid-cols-11 lg:grid-cols-13 gap-x-4 gap-y-6 md:gap-6 w-full px-6 place-items-center">
         {Array.from({ length: daysInMonth }, (_, i) => {
           const dayNum = i + 1;
-          const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
-          const hasEntry = days.some(d => d.date === dateStr);
+          const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
+          const hasEntry = days.some((d) => d.date === dateStr);
           const isToday = dayNum === today.getDate();
 
           return (
             <button
               key={dayNum}
               onClick={() => hasEntry && router.push(`/notes/${dateStr}`)}
-              className={`w-[15px] h-[15px] rounded-full transition-all duration-500 ease-in-out relative group ${hasEntry
-                ? "bg-orange-500 hover:scale-115 cursor-pointer shadow-[0_0_15px_rgba(249,115,22,0.3)]"
-                : "bg-muted-foreground/15 cursor-default"
-                } ${isToday ? "ring-2 ring-orange-500/40 ring-offset-2" : ""}`}
-              title={hasEntry ? `Note for ${formatDateDisplay(dateStr)}` : undefined}
+              className={`w-[15px] h-[15px] rounded-full transition-all duration-500 ease-in-out relative group ${
+                hasEntry
+                  ? "bg-orange-500 hover:scale-115 cursor-pointer shadow-[0_0_15px_rgba(249,115,22,0.3)]"
+                  : "bg-muted-foreground/15 cursor-default"
+              } ${isToday ? "ring-2 ring-orange-500/40 ring-offset-2" : ""}`}
+              title={
+                hasEntry ? `Note for ${formatDateDisplay(dateStr)}` : undefined
+              }
             >
               {isToday && (
                 <span className="absolute inset-[-4px] rounded-full bg-orange-500/20 animate-ping [animation-duration:2.5s]" />
@@ -371,7 +423,9 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
         {/* Header Section */}
         <div className="shrink-0 pt-12 pb-4 px-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-[16px] md:text-[22px] font-normal tracking-tight">Ilo Journal</h1>
+            <h1 className="text-[16px] md:text-[22px] font-normal tracking-tight">
+              Ilo Journal
+            </h1>
 
             <div className="flex items-center gap-2">
               {/* Mode Selection Toggle */}
@@ -379,22 +433,24 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-9 w-9 rounded-lg transition-all ${viewMode === 'list'
-                    ? 'bg-background shadow-sm text-foreground ring-1 ring-border/20'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
-                    }`}
-                  onClick={() => setViewMode('list')}
+                  className={`h-9 w-9 rounded-lg transition-all ${
+                    viewMode === "list"
+                      ? "bg-background shadow-sm text-foreground ring-1 ring-border/20"
+                      : "text-muted-foreground hover:text-foreground hover:bg-transparent"
+                  }`}
+                  onClick={() => setViewMode("list")}
                 >
                   <IconList stroke={1.5} className="h-5 w-5" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-9 w-9 rounded-lg transition-all ${viewMode === 'calendar'
-                    ? 'bg-background shadow-sm text-foreground ring-1 ring-border/20'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
-                    }`}
-                  onClick={() => setViewMode('calendar')}
+                  className={`h-9 w-9 rounded-lg transition-all ${
+                    viewMode === "calendar"
+                      ? "bg-background shadow-sm text-foreground ring-1 ring-border/20"
+                      : "text-muted-foreground hover:text-foreground hover:bg-transparent"
+                  }`}
+                  onClick={() => setViewMode("calendar")}
                 >
                   <IconLayoutGrid stroke={1.5} className="h-5 w-5" />
                 </Button>
@@ -432,7 +488,7 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
                             <IconTrash className="h-4 w-4" />
                             {trashCount > 0 && (
                               <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-orange-500 text-white text-[9px] font-bold flex items-center justify-center rounded-full">
-                                {trashCount > 9 ? '9+' : trashCount}
+                                {trashCount > 9 ? "9+" : trashCount}
                               </span>
                             )}
                           </div>
@@ -454,7 +510,9 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
                         <div className="flex items-start gap-2 text-muted-foreground">
                           <IconInfoCircle className="h-4 w-4 shrink-0 mt-0.5" />
                           <span className="text-xs leading-relaxed">
-                            {session ? "Entries will be saved to your Google Account" : "Entries save automatically as you type"}
+                            {session
+                              ? "Entries will be saved to your Google Account"
+                              : "Entries save automatically as you type"}
                           </span>
                         </div>
                       </div>
@@ -464,13 +522,14 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
               </div>
             </div>
           </div>
-
         </div>
 
         {/* Content Section */}
-        <div className="flex-1 min-h-0 flex flex-col mt-3 pb-[140px]"> {/* Added padding at bottom to clear the fixed footer */}
+        <div className="flex-1 min-h-0 flex flex-col mt-3 pb-[140px]">
+          {" "}
+          {/* Added padding at bottom to clear the fixed footer */}
           <div className="flex-1 min-h-0">
-            {viewMode === 'list' ? (
+            {viewMode === "list" ? (
               days.length === 0 ? (
                 <div className="flex-1 flex items-center justify-center px-6">
                   <EmptyState variant="notes" />
@@ -480,7 +539,9 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
                   <div className="flex flex-col gap-2 md:gap-0 px-6 pb-6">
                     {days.map((day) => {
                       const isToday = day.date === formatDate(new Date());
-                      const dayMoods = day.entries.map(e => e.mood).filter(Boolean) as Mood[];
+                      const dayMoods = day.entries
+                        .map((e) => e.mood)
+                        .filter(Boolean) as Mood[];
                       const uniqueMoods = [...new Set(dayMoods)];
 
                       return (
@@ -490,7 +551,8 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
                           onClick={() => {
                             if (openSwipeDate.current === day.date) {
                               const el = swipeRefs.current[day.date];
-                              if (el) animateSwipe(el, 0, () => hideBg(day.date));
+                              if (el)
+                                animateSwipe(el, 0, () => hideBg(day.date));
                               openSwipeDate.current = null;
                             }
                           }}
@@ -498,9 +560,11 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
                           {/* Red delete background - hidden by default, shown via JS during swipe */}
                           {!isToday && (
                             <div
-                              ref={(el) => { bgRefs.current[day.date] = el; }}
+                              ref={(el) => {
+                                bgRefs.current[day.date] = el;
+                              }}
                               className="absolute right-0 top-0 bottom-0 w-[80px] bg-destructive flex items-center justify-center rounded-r-[4px] md:hidden"
-                              style={{ visibility: 'hidden' }}
+                              style={{ visibility: "hidden" }}
                             >
                               <button
                                 onClick={(e) => {
@@ -517,9 +581,13 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
 
                           {/* Content layer - swipeable on mobile */}
                           <div
-                            ref={(el) => { swipeRefs.current[day.date] = el; }}
+                            ref={(el) => {
+                              swipeRefs.current[day.date] = el;
+                            }}
                             className="group flex items-center justify-between py-1 px-2 bg-background md:hover:bg-accent/35 relative rounded-[4px]"
-                            onTouchStart={(e) => !isToday && onTouchStart(e, day.date)}
+                            onTouchStart={(e) =>
+                              !isToday && onTouchStart(e, day.date)
+                            }
                             onTouchMove={(e) => !isToday && onTouchMove(e)}
                             onTouchEnd={() => !isToday && onTouchEnd(day.date)}
                           >
@@ -577,9 +645,7 @@ export default function NotesPage({ initialDays }: { initialDays?: JournalDay[] 
               {currentDateDisplay}
             </div>
             <Link href="/">
-              <div
-                className="relative flex justify-center items-center bg-[#1a1a1a] dark:bg-[#2a2a2a] text-white font-medium text-[13px] px-5 py-2.5 rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.35)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] transition-all duration-200 ease-out overflow-hidden group"
-              >
+              <div className="relative flex justify-center items-center bg-[#1a1a1a] dark:bg-[#2a2a2a] text-white font-medium text-[13px] px-5 py-2.5 rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.35)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] transition-all duration-200 ease-out overflow-hidden group">
                 {/* Subtle gradient overlay for depth */}
                 <span className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                 {/* Jelly bounce animation on press */}

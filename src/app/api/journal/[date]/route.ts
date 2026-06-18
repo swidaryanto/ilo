@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
+
+import type { JournalEntry, Mood } from "@/lib/types/journal";
+
 import { getRequiredSession } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { JournalEntry, Mood } from "@/lib/types/journal";
 
 type RouteContext = { params: Promise<{ date: string }> };
 
@@ -42,11 +44,16 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
 
     if (error) throw error;
 
-    const entries: JournalEntry[] = ((data as EntryRow[]) ?? []).map(rowToEntry);
+    const entries: JournalEntry[] = ((data as EntryRow[]) ?? []).map(
+      rowToEntry
+    );
     return NextResponse.json({ entries });
   } catch (err) {
     if (err instanceof Response) return err;
-    return NextResponse.json({ error: "Failed to load entries" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to load entries" },
+      { status: 500 }
+    );
   }
 }
 
@@ -75,7 +82,12 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof Response) return err;
-    const e = err as { message?: string; code?: string; details?: string; hint?: string };
+    const e = err as {
+      message?: string;
+      code?: string;
+      details?: string;
+      hint?: string;
+    };
     const message =
       e?.message ?? e?.details ?? e?.hint ?? "Failed to save entry";
     return NextResponse.json(
@@ -111,6 +123,9 @@ export async function DELETE(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof Response) return err;
-    return NextResponse.json({ error: "Failed to delete entry" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete entry" },
+      { status: 500 }
+    );
   }
 }

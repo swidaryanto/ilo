@@ -1,7 +1,8 @@
 "use client";
 
-import * as React from "react";
 import { IconX } from "@tabler/icons-react";
+import * as React from "react";
+
 import { cn } from "@/lib/utils";
 
 export type ToastType = "error" | "success" | "info" | "warning";
@@ -25,7 +26,9 @@ interface ToastContextValue {
   removeToast: (id: string) => void;
 }
 
-const ToastContext = React.createContext<ToastContextValue | undefined>(undefined);
+const ToastContext = React.createContext<ToastContextValue | undefined>(
+  undefined
+);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = React.useState<Toast[]>([]);
@@ -90,9 +93,11 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
 
   const bgColors = {
     error: "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800",
-    success: "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800",
+    success:
+      "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800",
     info: "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800",
-    warning: "bg-muted/30 dark:bg-muted/20 border-border/50 dark:border-white/10",
+    warning:
+      "bg-muted/30 dark:bg-muted/20 border-border/50 dark:border-white/10",
   };
 
   return (

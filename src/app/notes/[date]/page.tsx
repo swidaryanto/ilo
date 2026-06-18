@@ -1,22 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { BrailleLoader } from "@/components/ui/braille-spinner";
-import { useJournal } from "@/hooks/use-journal";
-import { HourSection } from "@/components/journal/hour-section";
-import { formatDate, formatDateDisplay } from "@/lib/utils/date";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
+import { HourSection } from "@/components/journal/hour-section";
+import { BrailleLoader } from "@/components/ui/braille-spinner";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useJournal } from "@/hooks/use-journal";
+import { formatDate, formatDateDisplay } from "@/lib/utils/date";
 
 export default function DateNotesPage() {
   const params = useParams();
   const date = params.date as string;
-  const {
-    loading,
-    saveEntry,
-    getEntryForHour,
-  } = useJournal(date);
+  const { loading, saveEntry, getEntryForHour } = useJournal(date);
 
   const [focusedHour, setFocusedHour] = useState<number | null>(null);
   const [hoveredHour, setHoveredHour] = useState<number | null>(null);
@@ -39,7 +36,7 @@ export default function DateNotesPage() {
     setHoveredHour(null);
   };
 
-  const handleHourBlur = () => { };
+  const handleHourBlur = () => {};
 
   const handleHourHover = (hour: number) => {
     if (focusedHour !== hour) {
@@ -119,4 +116,3 @@ export default function DateNotesPage() {
     </div>
   );
 }
-

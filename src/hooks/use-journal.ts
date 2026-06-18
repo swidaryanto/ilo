@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+
 import type { JournalEntry, Mood } from "@/lib/types/journal";
-import { formatDate } from "@/lib/utils/date";
+
 import { useStorage } from "@/hooks/use-storage";
+import { formatDate } from "@/lib/utils/date";
 
 function generateEntryId(date: string, hour: number): string {
   return `${date}-${hour}`;
@@ -15,11 +17,16 @@ export interface SaveError {
   timestamp: number;
 }
 
-export function useJournal(initialDate?: string, prefetchedEntries?: JournalEntry[]) {
+export function useJournal(
+  initialDate?: string,
+  prefetchedEntries?: JournalEntry[]
+) {
   const [selectedDate] = useState<string>(
     initialDate || formatDate(new Date())
   );
-  const [entries, setEntries] = useState<JournalEntry[]>(prefetchedEntries ?? []);
+  const [entries, setEntries] = useState<JournalEntry[]>(
+    prefetchedEntries ?? []
+  );
   const [loading, setLoading] = useState(!prefetchedEntries);
   const [saveError, setSaveError] = useState<SaveError | null>(null);
   const { storage, isLoading: storageLoading } = useStorage();
@@ -36,7 +43,8 @@ export function useJournal(initialDate?: string, prefetchedEntries?: JournalEntr
         setEntries([]);
         setSaveError({
           hour: -1,
-          message: "Failed to load journal entries. Your data may not be accessible.",
+          message:
+            "Failed to load journal entries. Your data may not be accessible.",
           timestamp: Date.now(),
         });
       } finally {
@@ -77,7 +85,8 @@ export function useJournal(initialDate?: string, prefetchedEntries?: JournalEntr
         setSaveError(null);
         return true;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Failed to save your entry";
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to save your entry";
         setSaveError({
           hour,
           message: errorMessage,

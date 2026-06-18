@@ -1,7 +1,8 @@
 "use client";
 
-import * as React from "react";
 import { IconArrowRight } from "@tabler/icons-react";
+import * as React from "react";
+
 import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
@@ -21,7 +22,7 @@ export function EmptyState({
     <div
       className={cn(
         "flex flex-col items-center justify-center text-center px-6 py-12",
-        className,
+        className
       )}
     >
       {/* Illustration */}
@@ -53,7 +54,7 @@ export function EmptyState({
           "flex items-center gap-2 text-xs font-medium",
           isJournal
             ? "text-orange-500 dark:text-orange-400"
-            : "text-muted-foreground",
+            : "text-muted-foreground"
         )}
       >
         {isJournal ? (

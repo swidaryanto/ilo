@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { cn } from "@/lib/utils";
 
 interface StreakBadgeProps {
@@ -9,7 +10,11 @@ interface StreakBadgeProps {
   onAnimationComplete?: () => void;
 }
 
-export function StreakBadge({ streak, show, onAnimationComplete }: StreakBadgeProps) {
+export function StreakBadge({
+  streak,
+  show,
+  onAnimationComplete,
+}: StreakBadgeProps) {
   const [visible, setVisible] = useState(show);
   const [animate, setAnimate] = useState(false);
 

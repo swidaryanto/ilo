@@ -1,13 +1,20 @@
 "use client";
 
+import { IconLogout2 } from "@tabler/icons-react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
-import { IconLogout2 } from "@tabler/icons-react";
+
 import { BrailleSpinner } from "@/components/ui/braille-spinner";
 
 function EllipseIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style={{ pointerEvents: "none" }}>
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      style={{ pointerEvents: "none" }}
+    >
       <circle cx="12" cy="12" fill="#5058f2" r="9" />
     </svg>
   );
@@ -36,11 +43,17 @@ function GoogleIcon() {
   );
 }
 
-export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
+export function AuthButton({
+  variant = "desktop",
+}: {
+  variant?: "desktop" | "mobile";
+}) {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
-    return <BrailleSpinner className="text-muted-foreground text-base w-6 h-6 flex items-center justify-center" />;
+    return (
+      <BrailleSpinner className="text-muted-foreground text-base w-6 h-6 flex items-center justify-center" />
+    );
   }
 
   if (session) {
@@ -64,7 +77,7 @@ export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mob
           <Link
             href="/notes"
             className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 overflow-hidden hover:scale-110 hover:shadow-[0_0_0_3px_rgba(80,88,242,0.25)] active:scale-95 active:shadow-none"
-            aria-label="Go to home"
+            aria-label="Go to notes"
           >
             <EllipseIcon />
           </Link>
@@ -73,7 +86,7 @@ export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mob
             <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
               <div className="absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45" />
               <div className="relative z-10 font-[family-name:var(--font-sans)] select-none font-medium">
-                Go to home
+                Go to notes
               </div>
             </div>
           </div>
@@ -110,7 +123,14 @@ export function AuthButton({ variant = "desktop" }: { variant?: "desktop" | "mob
         className="flex items-center gap-2 w-full px-2.5 py-2 rounded-md hover:bg-accent/50 transition-colors text-left"
         aria-label="Login"
       >
-        <img src="/login.svg" width={20} height={20} alt="" aria-hidden="true" style={{ pointerEvents: "none" }} />
+        <img
+          src="/login.svg"
+          width={20}
+          height={20}
+          alt=""
+          aria-hidden="true"
+          style={{ pointerEvents: "none" }}
+        />
         <span className="text-sm text-foreground">Login</span>
       </button>
     );

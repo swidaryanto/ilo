@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "@/lib/utils";
+
 import type { Mood } from "@/lib/types/journal";
+
+import { cn } from "@/lib/utils";
 
 interface MoodOption {
   value: Mood;
@@ -33,11 +35,15 @@ interface MoodSelectorProps {
   className?: string;
 }
 
-export function MoodSelector({ selectedMood, onMoodSelect, className }: MoodSelectorProps) {
+export function MoodSelector({
+  selectedMood,
+  onMoodSelect,
+  className,
+}: MoodSelectorProps) {
   const [isHovered, setIsHovered] = React.useState(false);
   const [isPressed, setIsPressed] = React.useState<string | null>(null);
-  
-  const selectedMoodOption = selectedMood 
+
+  const selectedMoodOption = selectedMood
     ? MOODS.find((m) => m.value === selectedMood)
     : null;
 
@@ -73,7 +79,7 @@ export function MoodSelector({ selectedMood, onMoodSelect, className }: MoodSele
 
   // If mood is selected, show only selected by default, expand on hover
   return (
-    <div 
+    <div
       className={cn("flex items-center gap-1", className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -96,11 +102,12 @@ export function MoodSelector({ selectedMood, onMoodSelect, className }: MoodSele
               )}
               style={{
                 opacity: isPressed === mood.value ? 0.8 : isSelected ? 1 : 0.6,
-                transform: isPressed === mood.value 
-                  ? "scale(0.92)" 
-                  : isSelected 
-                    ? "scale(1.1)" 
-                    : "scale(1)",
+                transform:
+                  isPressed === mood.value
+                    ? "scale(0.92)"
+                    : isSelected
+                      ? "scale(1.1)"
+                      : "scale(1)",
                 transitionTimingFunction: EASING.swift,
                 transitionDelay: `${index * 20}ms`,
               }}
@@ -119,9 +126,7 @@ export function MoodSelector({ selectedMood, onMoodSelect, className }: MoodSele
           onMouseLeave={() => setIsPressed(null)}
           className="relative flex items-center justify-center w-7 h-7 rounded-full text-base"
           style={{
-            transform: isPressed === "selected"
-              ? "scale(0.92)"
-              : "scale(1.1)",
+            transform: isPressed === "selected" ? "scale(0.92)" : "scale(1.1)",
             opacity: isPressed === "selected" ? 0.8 : 1,
             transition: "all 200ms cubic-bezier(.52, .062, .64, .21)",
           }}
@@ -134,7 +139,13 @@ export function MoodSelector({ selectedMood, onMoodSelect, className }: MoodSele
   );
 }
 
-export function MoodBadge({ mood, className }: { mood?: Mood; className?: string }) {
+export function MoodBadge({
+  mood,
+  className,
+}: {
+  mood?: Mood;
+  className?: string;
+}) {
   if (!mood) return null;
 
   const moodOption = MOODS.find((m) => m.value === mood);

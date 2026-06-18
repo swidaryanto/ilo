@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useState, useEffect, useCallback } from "react";
+
 import {
   hasMigrationFlag,
   setMigrationFlag,
@@ -17,14 +18,18 @@ export type MigrationState =
 
 export function useMigration() {
   const { status } = useSession();
-  const [migrationState, setMigrationState] = useState<MigrationState>({ status: "idle" });
+  const [migrationState, setMigrationState] = useState<MigrationState>({
+    status: "idle",
+  });
 
   useEffect(() => {
     if (status !== "authenticated") return;
     if (hasMigrationFlag()) return;
 
     const days = getLocalStorageJournalData();
-    const hasData = days.some((d) => d.entries.some((e) => e.content.trim().length > 0));
+    const hasData = days.some((d) =>
+      d.entries.some((e) => e.content.trim().length > 0)
+    );
     if (hasData) {
       setMigrationState({ status: "pending", dayCount: days.length });
     }
@@ -45,9 +50,15 @@ export function useMigration() {
           });
           if (!res.ok) {
             const text = await res.text();
-            console.error(`[migration] POST /api/journal/${day.date} → ${res.status}:`, text);
+            console.error(
+              `[migration] POST /api/journal/${day.date} → ${res.status}:`,
+              text
+            );
             let message = "Failed to save entry";
-            try { message = (JSON.parse(text) as { error?: string }).error ?? message; } catch {}
+            try {
+              message =
+                (JSON.parse(text) as { error?: string }).error ?? message;
+            } catch {}
             throw new Error(message);
           }
         }

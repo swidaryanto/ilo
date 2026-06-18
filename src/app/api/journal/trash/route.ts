@@ -1,8 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
+
+import type { TrashItem } from "@/lib/storage/trash-storage";
+import type { JournalDay, JournalEntry, Mood } from "@/lib/types/journal";
+
 import { getRequiredSession } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { JournalDay, JournalEntry, Mood } from "@/lib/types/journal";
-import type { TrashItem } from "@/lib/storage/trash-storage";
 
 type TrashRow = {
   id: string;
@@ -44,7 +46,10 @@ export async function GET() {
     return NextResponse.json({ items });
   } catch (err) {
     if (err instanceof Response) return err;
-    return NextResponse.json({ error: "Failed to load trash" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to load trash" },
+      { status: 500 }
+    );
   }
 }
 
@@ -73,7 +78,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof Response) return err;
-    return NextResponse.json({ error: "Failed to update trash" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update trash" },
+      { status: 500 }
+    );
   }
 }
 
@@ -132,6 +140,9 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof Response) return err;
-    return NextResponse.json({ error: "Failed to process trash action" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to process trash action" },
+      { status: 500 }
+    );
   }
 }

@@ -1,4 +1,5 @@
 import type { JournalDay, JournalEntry } from "@/lib/types/journal";
+
 import type { TrashItem } from "./trash-storage";
 
 export interface TrashStorageInterface {

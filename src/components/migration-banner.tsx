@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+
 import { useMigration } from "@/hooks/use-migration";
 
 export function MigrationBanner() {
@@ -31,10 +32,13 @@ export function MigrationBanner() {
       <div className="bg-background border border-border rounded-xl px-4 py-3 shadow-lg max-w-sm w-full mx-4">
         {migrationState.status === "pending" && (
           <>
-            <p className="text-sm font-medium mb-1">Sync your local data to the cloud?</p>
+            <p className="text-sm font-medium mb-1">
+              Sync your local data to the cloud?
+            </p>
             <p className="text-xs text-muted-foreground mb-3">
-              {migrationState.dayCount} day{migrationState.dayCount !== 1 ? "s" : ""} of journal
-              entries found on this device.
+              {migrationState.dayCount} day
+              {migrationState.dayCount !== 1 ? "s" : ""} of journal entries
+              found on this device.
             </p>
             <div className="flex gap-2">
               <button
@@ -58,14 +62,18 @@ export function MigrationBanner() {
         {migrationState.status === "migrating" && (
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 border-2 border-foreground border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-muted-foreground">Syncing your journal...</p>
+            <p className="text-sm text-muted-foreground">
+              Syncing your journal...
+            </p>
           </div>
         )}
 
         {migrationState.status === "error" && (
           <>
             <p className="text-sm font-medium text-red-500 mb-1">Sync failed</p>
-            <p className="text-xs text-muted-foreground mb-3">{migrationState.message}</p>
+            <p className="text-xs text-muted-foreground mb-3">
+              {migrationState.message}
+            </p>
             <div className="flex gap-2">
               <button
                 type="button"

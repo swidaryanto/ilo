@@ -9,4 +9,3 @@ export interface JournalStorage {
   getDay(date: string): Promise<JournalDay | null>;
   getAllDays(): Promise<JournalDay[]>;
 }
-

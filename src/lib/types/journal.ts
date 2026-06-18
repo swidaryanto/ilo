@@ -1,4 +1,10 @@
-export type Mood = "happy" | "sad" | "frustrated" | "tired" | "excited" | "calm";
+export type Mood =
+  | "happy"
+  | "sad"
+  | "frustrated"
+  | "tired"
+  | "excited"
+  | "calm";
 
 export interface JournalEntry {
   id: string;
@@ -14,4 +20,3 @@ export interface JournalDay {
   date: string;
   entries: JournalEntry[];
 }
-

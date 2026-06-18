@@ -1,5 +1,6 @@
-import { auth } from "@/auth";
 import type { Session } from "next-auth";
+
+import { auth } from "@/auth";
 
 type RequiredSession = Session & { user: { id: string } };
 

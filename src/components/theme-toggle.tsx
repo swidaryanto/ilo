@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
 import { IconInfoCircle, IconMoon, IconSun } from "@tabler/icons-react";
 import { useTheme } from "next-themes";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -12,7 +12,9 @@ export function ThemeToggle() {
   const [showThemeTooltip, setShowThemeTooltip] = React.useState(false);
 
   const isDark = theme === "dark";
-  const themeTooltipText = isDark ? "Click for light theme" : "Click for dark theme";
+  const themeTooltipText = isDark
+    ? "Click for light theme"
+    : "Click for dark theme";
 
   return (
     <div className="flex items-center md:flex-col gap-1 md:gap-2">
@@ -32,7 +34,9 @@ export function ThemeToggle() {
         </Button>
 
         {/* Theme Tooltip */}
-        <div className={`absolute top-full right-0 mt-3 md:top-0 md:left-full md:ml-4 md:mt-0 ${showThemeTooltip ? 'opacity-100' : 'opacity-0'} transition-all duration-200 pointer-events-none z-50`}>
+        <div
+          className={`absolute top-full right-0 mt-3 md:top-0 md:left-full md:ml-4 md:mt-0 ${showThemeTooltip ? "opacity-100" : "opacity-0"} transition-all duration-200 pointer-events-none z-50`}
+        >
           <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
             {/* Arrow for Desktop (Left) */}
             <div className="hidden md:block absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45"></div>
@@ -63,7 +67,9 @@ export function ThemeToggle() {
         </Button>
 
         {/* Info Tooltip */}
-        <div className={`absolute top-full right-0 mt-3 md:top-0 md:left-full md:ml-4 md:mt-0 ${showInfoTooltip ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} transition-all duration-200 pointer-events-none z-50`}>
+        <div
+          className={`absolute top-full right-0 mt-3 md:top-0 md:left-full md:ml-4 md:mt-0 ${showInfoTooltip ? "opacity-100" : "opacity-0 md:group-hover:opacity-100"} transition-all duration-200 pointer-events-none z-50`}
+        >
           <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
             {/* Arrow for Desktop (Left) */}
             <div className="hidden md:block absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45"></div>
@@ -72,8 +78,12 @@ export function ThemeToggle() {
             <div className="md:hidden absolute right-[13px] -top-1 w-2 h-2 bg-white dark:bg-[#2D2D2D] border-t border-l border-black/5 dark:border-white/10 transform rotate-45"></div>
 
             <div className="relative z-10 font-[family-name:var(--font-sans)] flex flex-col gap-0 select-none">
-              <span className="font-medium hidden md:block">Hover to view the content</span>
-              <span className="text-black/50 dark:text-white/50">Your content is auto-save</span>
+              <span className="font-medium hidden md:block">
+                Hover to view the content
+              </span>
+              <span className="text-black/50 dark:text-white/50">
+                Your content is auto-save
+              </span>
             </div>
           </div>
         </div>
@@ -81,5 +91,3 @@ export function ThemeToggle() {
     </div>
   );
 }
-
-
