@@ -65,10 +65,11 @@ export default async function RootLayout({
 
               {/* Desktop: Fixed left sidebar */}
               <div className="hidden md:flex fixed left-4 top-1/2 -translate-y-1/2 z-50 flex-col items-center gap-2">
+                <AuthButton desktopPart="account" />
                 <ExportButton />
                 <ThemeToggle />
                 <TrashButton />
-                <AuthButton />
+                <AuthButton desktopPart="signout" />
               </div>
 
               {children}

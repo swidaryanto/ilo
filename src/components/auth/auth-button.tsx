@@ -43,14 +43,90 @@ function GoogleIcon() {
   );
 }
 
+function ProfileLinkButton() {
+  return (
+    <div className="relative group">
+      <Link
+        href="/notes"
+        className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 overflow-hidden hover:scale-110 hover:shadow-[0_0_0_3px_rgba(80,88,242,0.25)] active:scale-95 active:shadow-none"
+        aria-label="Go to notes"
+      >
+        <EllipseIcon />
+      </Link>
+
+      <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
+        <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
+          <div className="absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45" />
+          <div className="relative z-10 font-[family-name:var(--font-sans)] select-none font-medium">
+            Go to notes
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SignOutButton() {
+  return (
+    <div className="relative group">
+      <button
+        type="button"
+        onClick={() => signOut()}
+        className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 hover:bg-accent/50 text-foreground/80 active:scale-95"
+        aria-label="Sign out from your account"
+      >
+        <IconLogout2 className="h-[1.15rem] w-[1.15rem]" />
+      </button>
+
+      <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
+        <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
+          <div className="absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45" />
+          <div className="relative z-10 font-[family-name:var(--font-sans)] select-none font-medium">
+            Sign out from your account
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GoogleSignInButton() {
+  return (
+    <div className="relative group">
+      <button
+        type="button"
+        onClick={() => signIn("google")}
+        className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 border border-border bg-background hover:scale-110 hover:shadow-[0_0_0_3px_rgba(66,133,244,0.2)] hover:border-[#4285F4]/40 active:scale-95 active:shadow-none"
+        aria-label="Sign in with Google"
+      >
+        <GoogleIcon />
+      </button>
+      <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
+        <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
+          <div className="absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45" />
+          <div className="relative z-10 font-[family-name:var(--font-sans)] select-none font-medium">
+            Login to save your journal to the cloud.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AuthButton({
   variant = "desktop",
+  desktopPart,
 }: {
   variant?: "desktop" | "mobile";
+  desktopPart?: "account" | "signout";
 }) {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
+    if (variant === "desktop" && desktopPart === "signout") {
+      return null;
+    }
+
     return (
       <BrailleSpinner className="text-muted-foreground text-base w-6 h-6 flex items-center justify-center" />
     );
@@ -71,46 +147,18 @@ export function AuthButton({
       );
     }
 
+    if (desktopPart === "account") {
+      return <ProfileLinkButton />;
+    }
+
+    if (desktopPart === "signout") {
+      return <SignOutButton />;
+    }
+
     return (
       <div className="flex flex-col items-center gap-2">
-        <div className="relative group">
-          <Link
-            href="/notes"
-            className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 overflow-hidden hover:scale-110 hover:shadow-[0_0_0_3px_rgba(80,88,242,0.25)] active:scale-95 active:shadow-none"
-            aria-label="Go to notes"
-          >
-            <EllipseIcon />
-          </Link>
-
-          <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
-            <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
-              <div className="absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45" />
-              <div className="relative z-10 font-[family-name:var(--font-sans)] select-none font-medium">
-                Go to notes
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative group">
-          <button
-            type="button"
-            onClick={() => signOut()}
-            className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 hover:bg-accent/50 text-foreground/80 active:scale-95"
-            aria-label="Sign out from your account"
-          >
-            <IconLogout2 className="h-[1.15rem] w-[1.15rem]" />
-          </button>
-
-          <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
-            <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
-              <div className="absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45" />
-              <div className="relative z-10 font-[family-name:var(--font-sans)] select-none font-medium">
-                Sign out from your account
-              </div>
-            </div>
-          </div>
-        </div>
+        <ProfileLinkButton />
+        <SignOutButton />
       </div>
     );
   }
@@ -136,25 +184,9 @@ export function AuthButton({
     );
   }
 
-  return (
-    <div className="relative group">
-      <button
-        type="button"
-        onClick={() => signIn("google")}
-        className="rounded-full w-8 h-8 flex items-center justify-center transition-all duration-150 border border-border bg-background hover:scale-110 hover:shadow-[0_0_0_3px_rgba(66,133,244,0.2)] hover:border-[#4285F4]/40 active:scale-95 active:shadow-none"
-        aria-label="Sign in with Google"
-      >
-        <GoogleIcon />
-      </button>
-      {/* Tooltip */}
-      <div className="absolute top-0 left-full ml-4 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
-        <div className="relative bg-white dark:bg-[#2D2D2D] text-[#111] dark:text-[#E0E0E0] text-[13px] px-3 py-2 rounded-xl shadow-lg border border-black/5 dark:border-white/10 whitespace-nowrap w-max">
-          <div className="absolute -left-1 top-[13px] w-2 h-2 bg-white dark:bg-[#2D2D2D] border-l border-b border-black/5 dark:border-white/10 transform rotate-45" />
-          <div className="relative z-10 font-[family-name:var(--font-sans)] select-none font-medium">
-            Login to save your journal to the cloud.
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  if (desktopPart === "signout") {
+    return null;
+  }
+
+  return <GoogleSignInButton />;
 }
