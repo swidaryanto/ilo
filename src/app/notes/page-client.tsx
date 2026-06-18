@@ -39,6 +39,7 @@ import {
   formatDateDisplay,
   formatDateShortDisplay,
 } from "@/lib/utils/date";
+import { getDayPreview } from "@/lib/utils/journal";
 
 const SWIPE_ACTION_WIDTH = 80;
 const SWIPE_THRESHOLD = 40;
@@ -543,6 +544,7 @@ export default function NotesPage({
                         .map((e) => e.mood)
                         .filter(Boolean) as Mood[];
                       const uniqueMoods = [...new Set(dayMoods)];
+                      const preview = getDayPreview(day);
 
                       return (
                         <div
@@ -593,19 +595,34 @@ export default function NotesPage({
                           >
                             <Link
                               href={`/notes/${day.date}`}
-                              className="flex-1 flex items-center gap-2 text-sm md:text-xl font-semibold hover:text-muted-foreground transition-colors py-2"
+                              className="flex-1 flex flex-col items-start py-2 min-w-0 hover:text-muted-foreground transition-colors"
                               onClick={(e) => {
                                 if (openSwipeDate.current === day.date) {
                                   e.preventDefault();
                                 }
                               }}
                             >
-                              {formatDateDisplay(day.date)}
-                              {uniqueMoods.length > 0 && (
-                                <span className="flex items-center gap-1">
-                                  {uniqueMoods.slice(0, 3).map((mood, i) => (
-                                    <MoodBadge key={i} mood={mood} />
-                                  ))}
+                              <span className="flex items-center gap-2 text-sm md:text-xl font-semibold">
+                                {formatDateDisplay(day.date)}
+                                {uniqueMoods.length > 0 && (
+                                  <span className="flex items-center gap-1">
+                                    {uniqueMoods.slice(0, 3).map((mood, i) => (
+                                      <MoodBadge key={i} mood={mood} />
+                                    ))}
+                                  </span>
+                                )}
+                              </span>
+                              {preview && (
+                                <span className="hidden md:flex items-start gap-1.5 w-full max-h-0 opacity-0 overflow-hidden group-hover:max-h-14 group-hover:opacity-100 group-hover:pt-1 transition-all duration-200">
+                                  {preview.mood && (
+                                    <MoodBadge
+                                      mood={preview.mood}
+                                      className="shrink-0 mt-0.5"
+                                    />
+                                  )}
+                                  <span className="text-sm text-muted-foreground font-normal line-clamp-2">
+                                    {preview.text}
+                                  </span>
                                 </span>
                               )}
                             </Link>
