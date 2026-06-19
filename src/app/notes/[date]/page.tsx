@@ -67,8 +67,8 @@ export default function DateNotesPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen max-w-4xl mx-auto overflow-hidden">
-      <div className="shrink-0 py-12">
+    <div className="mx-auto flex h-dvh max-w-4xl flex-col overflow-hidden">
+      <div className="shrink-0 pb-12 pt-[max(3rem,env(safe-area-inset-top))]">
         <div className="flex flex-col px-6 gap-1">
           <h1 className="text-2xl font-semibold tracking-tight leading-tight">
             {formatDateDisplay(date)}
@@ -83,7 +83,7 @@ export default function DateNotesPage() {
       </div>
 
       <ScrollArea className="flex-1 min-h-0">
-        <div className="flex flex-col gap-2 px-6 pb-6">
+        <div className="flex flex-col gap-2 px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           {Array.from({ length: 24 }).map((_, i) => {
             const hour = i;
             const entry = getEntryForHour(hour);

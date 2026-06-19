@@ -73,7 +73,7 @@ export function HourSection({
       )}
     >
       {/* Left: Hour label */}
-      <div className="flex flex-col gap-2 min-w-[60px] items-start justify-start pt-1.5 relative">
+      <div className="relative flex min-w-[60px] flex-col items-start justify-start gap-2 pt-2.5">
         <span className="text-sm font-medium text-muted-foreground">
           {formatHour(hour)}
         </span>
@@ -123,8 +123,8 @@ export function HourSection({
             }
           }}
           className={cn(
-            "w-full bg-transparent border-0 outline-none resize-none min-h-[36px] px-2 py-1.5",
-            "text-sm text-foreground placeholder:text-muted-foreground/50",
+            "w-full bg-transparent border-0 outline-none resize-none min-h-[44px] px-2 py-2.5",
+            "text-base md:text-sm text-foreground placeholder:text-muted-foreground/50",
             "focus:outline-none focus:ring-0"
           )}
           rows={1}

@@ -381,7 +381,7 @@ export default function NotesPage({
   // Calendar View Component
   const CalendarView = () => (
     <div className="flex flex-col items-center flex-1 py-3 w-full max-w-full">
-      <div className="grid grid-cols-7 sm:grid-cols-9 md:grid-cols-11 lg:grid-cols-13 gap-x-4 gap-y-6 md:gap-6 w-full px-6 place-items-center">
+      <div className="grid w-full grid-cols-7 place-items-center gap-x-1 gap-y-2 px-6 sm:grid-cols-9 sm:gap-x-4 md:grid-cols-11 md:gap-6 lg:grid-cols-13">
         {Array.from({ length: daysInMonth }, (_, i) => {
           const dayNum = i + 1;
           const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
@@ -392,21 +392,32 @@ export default function NotesPage({
             <button
               key={dayNum}
               onClick={() => hasEntry && router.push(`/notes/${dateStr}`)}
-              className={`w-[15px] h-[15px] rounded-full transition-all duration-500 ease-in-out relative group ${
-                hasEntry
-                  ? "bg-orange-500 hover:scale-115 cursor-pointer shadow-[0_0_15px_rgba(249,115,22,0.3)]"
-                  : "bg-muted-foreground/15 cursor-default"
-              } ${isToday ? "ring-2 ring-orange-500/40 ring-offset-2" : ""}`}
+              className={`group flex size-11 items-center justify-center rounded-full ${
+                hasEntry ? "cursor-pointer" : "cursor-default"
+              }`}
               title={
                 hasEntry ? `Note for ${formatDateDisplay(dateStr)}` : undefined
               }
+              aria-label={
+                hasEntry
+                  ? `Open note for ${formatDateDisplay(dateStr)}`
+                  : `No note for day ${dayNum}`
+              }
             >
-              {isToday && (
-                <span className="absolute inset-[-4px] rounded-full bg-orange-500/20 animate-ping [animation-duration:2.5s]" />
-              )}
-              {hasEntry && (
-                <span className="absolute inset-0 rounded-full animate-pulse bg-orange-500/20 group-hover:block hidden" />
-              )}
+              <span
+                className={`relative block size-[15px] rounded-full transition-all duration-500 ease-in-out ${
+                  hasEntry
+                    ? "bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] group-hover:scale-115"
+                    : "bg-muted-foreground/15"
+                } ${isToday ? "ring-2 ring-orange-500/40 ring-offset-2" : ""}`}
+              >
+                {isToday && (
+                  <span className="absolute inset-[-4px] animate-ping rounded-full bg-orange-500/20 [animation-duration:2.5s]" />
+                )}
+                {hasEntry && (
+                  <span className="absolute inset-0 hidden animate-pulse rounded-full bg-orange-500/20 group-hover:block" />
+                )}
+              </span>
             </button>
           );
         })}
@@ -420,9 +431,9 @@ export default function NotesPage({
 
   return (
     <>
-      <div className="flex flex-col h-screen max-w-4xl mx-auto overflow-hidden">
+      <div className="mx-auto flex h-dvh max-w-4xl flex-col overflow-hidden">
         {/* Header Section */}
-        <div className="shrink-0 pt-12 pb-4 px-6">
+        <div className="shrink-0 px-6 pb-4 pt-[max(3rem,env(safe-area-inset-top))]">
           <div className="flex items-center justify-between">
             <h1 className="text-[16px] md:text-[22px] font-normal tracking-tight">
               Ilo Journal
@@ -434,7 +445,9 @@ export default function NotesPage({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-9 w-9 rounded-lg transition-all ${
+                  aria-label="Show list view"
+                  aria-pressed={viewMode === "list"}
+                  className={`h-11 w-11 rounded-lg transition-all ${
                     viewMode === "list"
                       ? "bg-background shadow-sm text-foreground ring-1 ring-border/20"
                       : "text-muted-foreground hover:text-foreground hover:bg-transparent"
@@ -446,7 +459,9 @@ export default function NotesPage({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-9 w-9 rounded-lg transition-all ${
+                  aria-label="Show calendar view"
+                  aria-pressed={viewMode === "calendar"}
+                  className={`h-11 w-11 rounded-lg transition-all ${
                     viewMode === "calendar"
                       ? "bg-background shadow-sm text-foreground ring-1 ring-border/20"
                       : "text-muted-foreground hover:text-foreground hover:bg-transparent"
@@ -461,7 +476,7 @@ export default function NotesPage({
               <div className="md:hidden">
                 <Popover>
                   <PopoverTrigger>
-                    <div className="flex items-center justify-center h-9 w-9 rounded-lg hover:bg-accent/50 cursor-pointer">
+                    <div className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-lg hover:bg-accent/50">
                       <IconDotsVertical className="h-5 w-5" />
                     </div>
                   </PopoverTrigger>
@@ -595,7 +610,7 @@ export default function NotesPage({
                           >
                             <Link
                               href={`/notes/${day.date}`}
-                              className="flex-1 flex flex-col items-start py-2 min-w-0 hover:text-muted-foreground transition-colors"
+                              className="flex min-h-11 min-w-0 flex-1 flex-col items-start justify-center py-2 transition-colors hover:text-muted-foreground"
                               onClick={(e) => {
                                 if (openSwipeDate.current === day.date) {
                                   e.preventDefault();
@@ -656,13 +671,13 @@ export default function NotesPage({
         </div>
 
         {/* Fixed Bottom Footer */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md pt-4 pb-8 z-10 mx-auto max-w-4xl border-t border-transparent">
+        <div className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-4xl border-t border-transparent bg-background/80 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur-md">
           <div className="flex items-center justify-between w-full px-6 md:max-w-[492px] md:mx-auto md:px-0">
             <div className="text-[13px] font-medium text-muted-foreground">
               {currentDateDisplay}
             </div>
             <Link href="/">
-              <div className="relative flex justify-center items-center bg-[#1a1a1a] dark:bg-[#2a2a2a] text-white font-medium text-[13px] px-5 py-2.5 rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.35)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] transition-all duration-200 ease-out overflow-hidden group">
+              <div className="group relative flex min-h-11 items-center justify-center overflow-hidden rounded-full bg-[#1a1a1a] px-5 py-2.5 text-[13px] font-medium text-white shadow-[0_4px_14px_rgba(0,0,0,0.25)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.35)] active:translate-y-0 active:scale-[0.96] dark:bg-[#2a2a2a]">
                 {/* Subtle gradient overlay for depth */}
                 <span className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                 {/* Jelly bounce animation on press */}

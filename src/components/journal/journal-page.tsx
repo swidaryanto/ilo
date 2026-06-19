@@ -57,7 +57,7 @@ export function JournalPage({
     ];
     const quote = quotes[Math.floor(Math.random() * quotes.length)];
     return (
-      <div className="flex flex-col items-center justify-center h-screen px-10 gap-3">
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-3 px-10">
         <p className="text-center text-muted-foreground text-sm italic">
           &ldquo;{quote}&rdquo;
         </p>
@@ -66,8 +66,8 @@ export function JournalPage({
   }
 
   return (
-    <div className="flex flex-col h-screen max-w-4xl mx-auto overflow-hidden">
-      <div className="shrink-0 pt-6 pb-8 md:pb-12 mt-8">
+    <div className="mx-auto flex h-dvh max-w-4xl flex-col overflow-hidden">
+      <div className="mt-8 shrink-0 pb-8 pt-[max(1.5rem,env(safe-area-inset-top))] md:pb-12">
         <div className="flex flex-col px-6 gap-2">
           <div className="flex items-start justify-between">
             <div className="flex flex-col gap-1">
@@ -89,7 +89,7 @@ export function JournalPage({
       </div>
 
       <ScrollArea className="flex-1 min-h-0">
-        <div className="flex flex-col gap-2 px-6 pb-6">
+        <div className="flex flex-col gap-2 px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           {!hasEntries && (
             <div className="py-8">
               <EmptyState

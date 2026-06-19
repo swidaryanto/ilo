@@ -21,7 +21,7 @@ export function BrailleSpinner({ className }: { className?: string }) {
 
 export function BrailleLoader() {
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex min-h-dvh items-center justify-center">
       <BrailleSpinner className="text-muted-foreground text-xl" />
     </div>
   );

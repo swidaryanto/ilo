@@ -95,19 +95,19 @@ export default function TrashPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center size-full h-screen">
+      <div className="flex min-h-dvh size-full items-center justify-center">
         <BrailleLoader />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen max-w-4xl mx-auto overflow-hidden">
+    <div className="mx-auto flex h-dvh max-w-4xl flex-col overflow-hidden">
       {/* Header */}
-      <div className="shrink-0 pt-12 pb-4 px-6">
+      <div className="shrink-0 px-6 pb-4 pt-[max(3rem,env(safe-area-inset-top))]">
         <div className="flex items-center gap-4">
           <Link href="/notes">
-            <Button variant="ghost" size="icon" className="h-9 w-9">
+            <Button variant="ghost" size="icon" className="h-11 w-11">
               <IconArrowLeft stroke={1.5} className="h-5 w-5" />
             </Button>
           </Link>
@@ -136,7 +136,7 @@ export default function TrashPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 pb-6">
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         {trashItems.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center h-full text-center py-12">
             {/* Illustration */}
@@ -211,7 +211,7 @@ export default function TrashPage() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleRestore(item.day.date)}
-                      className="h-9 w-9 text-muted-foreground hover:text-green-600 hover:bg-green-600/10"
+                      className="h-11 w-11 text-muted-foreground hover:bg-green-600/10 hover:text-green-600"
                       disabled={pendingDelete !== null}
                     >
                       <IconRotate2 stroke={1.5} className="h-5 w-5" />
@@ -220,7 +220,7 @@ export default function TrashPage() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handlePermanentDelete(item.day.date)}
-                      className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      className="h-11 w-11 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                       disabled={pendingDelete !== null}
                     >
                       <IconTrash stroke={1.5} className="h-5 w-5" />
