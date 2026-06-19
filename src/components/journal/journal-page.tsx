@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { EmptyState } from "@/components/empty-state";
+import { SyncStatusIndicator } from "@/components/sync-status";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/toast";
@@ -26,6 +27,8 @@ export function JournalPage({
     saveError,
     clearSaveError,
     entries,
+    isAuthenticated,
+    syncStatus,
   } = useJournal(currentDate, initialEntries);
 
   const currentHour = new Date().getHours();
@@ -80,6 +83,10 @@ export function JournalPage({
               >
                 Back to Notes
               </Link>
+              <SyncStatusIndicator
+                isAuthenticated={isAuthenticated}
+                status={syncStatus}
+              />
             </div>
             <div className="md:hidden mt-1">
               <ThemeToggle />

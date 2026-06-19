@@ -6,8 +6,8 @@ import { SupabaseAdapter } from "./supabase-adapter";
 import { SupabaseTrashStorage } from "./supabase-trash-storage";
 import { TrashStorage } from "./trash-storage";
 
-export function getJournalStorage(isAuthenticated: boolean): JournalStorage {
-  return isAuthenticated ? new SupabaseAdapter() : new LocalStorageAdapter();
+export function getJournalStorage(userId?: string): JournalStorage {
+  return userId ? new SupabaseAdapter(userId) : new LocalStorageAdapter();
 }
 
 export function getTrashStorage(

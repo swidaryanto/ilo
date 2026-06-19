@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 import type { JournalEntry, Mood } from "@/lib/types/journal";
 
@@ -29,7 +29,13 @@ export function useJournal(
   );
   const [loading, setLoading] = useState(!prefetchedEntries);
   const [saveError, setSaveError] = useState<SaveError | null>(null);
-  const { storage, isLoading: storageLoading } = useStorage();
+  const {
+    storage,
+    isLoading: storageLoading,
+    isAuthenticated,
+    syncStatus,
+  } = useStorage();
+  const previousSyncStatus = useRef(syncStatus);
 
   const loadEntries = useCallback(
     async (date: string) => {
@@ -58,6 +64,15 @@ export function useJournal(
     if (storageLoading) return;
     loadEntries(selectedDate);
   }, [selectedDate, loadEntries, storageLoading]);
+
+  useEffect(() => {
+    const previous = previousSyncStatus.current;
+    previousSyncStatus.current = syncStatus;
+
+    if (previous !== "synced" && syncStatus === "synced") {
+      loadEntries(selectedDate);
+    }
+  }, [loadEntries, selectedDate, syncStatus]);
 
   const saveEntry = useCallback(
     async (hour: number, content: string, mood?: Mood): Promise<boolean> => {
@@ -117,5 +132,7 @@ export function useJournal(
     getEntryForHour,
     saveError,
     clearSaveError,
+    isAuthenticated,
+    syncStatus,
   };
 }

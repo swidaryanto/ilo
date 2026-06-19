@@ -54,7 +54,12 @@ export default function NotesPage({
   const router = useRouter();
   const { addToast } = useToast();
   const { setTheme, theme } = useTheme();
-  const { storage, trashStorage, isLoading: storageLoading } = useStorage();
+  const {
+    storage,
+    trashStorage,
+    isLoading: storageLoading,
+    syncStatus,
+  } = useStorage();
   const { data: session } = useSession();
   const isDark = theme === "dark";
   const [days, setDays] = useState<JournalDay[]>(initialDays ?? []);
@@ -86,6 +91,7 @@ export default function NotesPage({
     lastTime: number;
   } | null>(null);
   const openSwipeDate = useRef<string | null>(null);
+  const previousSyncStatus = useRef(syncStatus);
   // Calculate days in current month for calendar view
   const today = new Date();
   const currentMonth = today.getMonth();
@@ -119,6 +125,15 @@ export default function NotesPage({
     loadAllDays();
     loadTrashCount();
   }, [loadAllDays, loadTrashCount, storageLoading]);
+
+  useEffect(() => {
+    const previous = previousSyncStatus.current;
+    previousSyncStatus.current = syncStatus;
+
+    if (!storageLoading && previous !== "synced" && syncStatus === "synced") {
+      loadAllDays();
+    }
+  }, [loadAllDays, storageLoading, syncStatus]);
 
   // Swipe hint — show on every page load, animated via direct DOM manipulation
   useEffect(() => {
@@ -475,7 +490,10 @@ export default function NotesPage({
               {/* Settings Menu - Mobile only */}
               <div className="md:hidden">
                 <Popover>
-                  <PopoverTrigger>
+                  <PopoverTrigger
+                    aria-label="Open settings"
+                    id="notes-settings-trigger"
+                  >
                     <div className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-lg hover:bg-accent/50">
                       <IconDotsVertical className="h-5 w-5" />
                     </div>
@@ -527,7 +545,13 @@ export default function NotesPage({
                           <IconInfoCircle className="h-4 w-4 shrink-0 mt-0.5" />
                           <span className="text-xs leading-relaxed">
                             {session
-                              ? "Entries will be saved to your Google Account"
+                              ? syncStatus === "offline"
+                                ? "Changes saved offline"
+                                : syncStatus === "syncing"
+                                  ? "Syncing changes..."
+                                  : syncStatus === "error"
+                                    ? "Sync paused. Changes remain on this device"
+                                    : "Saved to your Google Account"
                               : "Entries save automatically as you type"}
                           </span>
                         </div>

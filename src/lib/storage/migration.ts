@@ -4,6 +4,7 @@ import type { TrashItem } from "./trash-storage";
 
 const MIGRATION_FLAG_KEY = "ilo:migrated";
 const JOURNAL_PREFIX = "journal:";
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 export function hasMigrationFlag(): boolean {
   return localStorage.getItem(MIGRATION_FLAG_KEY) === "true";
@@ -20,7 +21,7 @@ export function getLocalStorageJournalData(): JournalDay[] {
     const key = localStorage.key(i);
     if (!key?.startsWith(JOURNAL_PREFIX)) continue;
     const date = key.replace(JOURNAL_PREFIX, "");
-    if (date === "trash") continue;
+    if (!DATE_PATTERN.test(date)) continue;
 
     try {
       const raw = localStorage.getItem(key);

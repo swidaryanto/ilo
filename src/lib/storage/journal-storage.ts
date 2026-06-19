@@ -9,3 +9,16 @@ export interface JournalStorage {
   getDay(date: string): Promise<JournalDay | null>;
   getAllDays(): Promise<JournalDay[]>;
 }
+
+export type SyncStatus = "synced" | "syncing" | "offline" | "error";
+
+export interface SyncableJournalStorage extends JournalStorage {
+  getSyncStatus(): SyncStatus;
+  syncPending(): Promise<void>;
+}
+
+export function isSyncableJournalStorage(
+  storage: JournalStorage
+): storage is SyncableJournalStorage {
+  return "syncPending" in storage && "getSyncStatus" in storage;
+}

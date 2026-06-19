@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { HourSection } from "@/components/journal/hour-section";
+import { SyncStatusIndicator } from "@/components/sync-status";
 import { BrailleLoader } from "@/components/ui/braille-spinner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useJournal } from "@/hooks/use-journal";
@@ -13,7 +14,8 @@ import { formatDate, formatDateDisplay } from "@/lib/utils/date";
 export default function DateNotesPage() {
   const params = useParams();
   const date = params.date as string;
-  const { loading, saveEntry, getEntryForHour } = useJournal(date);
+  const { loading, saveEntry, getEntryForHour, isAuthenticated, syncStatus } =
+    useJournal(date);
 
   const [focusedHour, setFocusedHour] = useState<number | null>(null);
   const [hoveredHour, setHoveredHour] = useState<number | null>(null);
@@ -79,6 +81,10 @@ export default function DateNotesPage() {
           >
             Back to Notes
           </Link>
+          <SyncStatusIndicator
+            isAuthenticated={isAuthenticated}
+            status={syncStatus}
+          />
         </div>
       </div>
 

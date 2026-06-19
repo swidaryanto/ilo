@@ -63,6 +63,25 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     const { date } = await params;
     const entry = (await req.json()) as JournalEntry;
     const db = createServerSupabaseClient();
+    const updatedAt = Number.isNaN(Date.parse(entry.updatedAt))
+      ? new Date().toISOString()
+      : entry.updatedAt;
+
+    const { data: existing, error: readError } = await db
+      .from("journal_entries")
+      .select("updated_at")
+      .eq("user_id", session.user.id)
+      .eq("id", entry.id)
+      .maybeSingle();
+
+    if (readError) throw readError;
+
+    if (
+      existing?.updated_at &&
+      Date.parse(existing.updated_at) > Date.parse(updatedAt)
+    ) {
+      return NextResponse.json({ success: true, conflict: "remote-newer" });
+    }
 
     const { error } = await db.from("journal_entries").upsert({
       id: entry.id,
@@ -71,7 +90,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       hour: entry.hour,
       content: entry.content,
       mood: entry.mood ?? null,
-      updated_at: new Date().toISOString(),
+      updated_at: updatedAt,
     });
 
     if (error) {
@@ -103,20 +122,27 @@ export async function DELETE(req: NextRequest, { params }: RouteContext) {
     const { date } = await params;
     const db = createServerSupabaseClient();
     const entryId = req.nextUrl.searchParams.get("entryId");
+    const requestedDeletedAt = req.nextUrl.searchParams.get("deletedAt");
+    const deletedAt =
+      requestedDeletedAt && !Number.isNaN(Date.parse(requestedDeletedAt))
+        ? requestedDeletedAt
+        : new Date().toISOString();
 
     if (entryId) {
       const { error } = await db
         .from("journal_entries")
         .delete()
         .eq("user_id", session.user.id)
-        .eq("id", entryId);
+        .eq("id", entryId)
+        .lte("updated_at", deletedAt);
       if (error) throw error;
     } else {
       const { error } = await db
         .from("journal_entries")
         .delete()
         .eq("user_id", session.user.id)
-        .eq("date", date);
+        .eq("date", date)
+        .lte("updated_at", deletedAt);
       if (error) throw error;
     }
 

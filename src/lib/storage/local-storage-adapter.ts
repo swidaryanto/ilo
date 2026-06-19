@@ -3,10 +3,7 @@ import type { JournalEntry, JournalDay } from "@/lib/types/journal";
 import type { JournalStorage } from "./journal-storage";
 
 const STORAGE_PREFIX = "journal:";
-
-function getStorageKey(date: string): string {
-  return `${STORAGE_PREFIX}${date}`;
-}
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
  * Checks if localStorage is available and writable.
@@ -41,6 +38,12 @@ function isLocalStorageQuotaExceeded(error: unknown): boolean {
 }
 
 export class LocalStorageAdapter implements JournalStorage {
+  constructor(private readonly storagePrefix = STORAGE_PREFIX) {}
+
+  private getStorageKey(date: string): string {
+    return `${this.storagePrefix}${date}`;
+  }
+
   async getEntries(date: string): Promise<JournalEntry[]> {
     if (typeof window === "undefined") {
       return [];
@@ -52,7 +55,7 @@ export class LocalStorageAdapter implements JournalStorage {
       );
     }
 
-    const key = getStorageKey(date);
+    const key = this.getStorageKey(date);
     const data = localStorage.getItem(key);
 
     if (!data) {
@@ -78,7 +81,7 @@ export class LocalStorageAdapter implements JournalStorage {
       );
     }
 
-    const key = getStorageKey(entry.date);
+    const key = this.getStorageKey(entry.date);
     const existingEntries = await this.getEntries(entry.date);
 
     const existingIndex = existingEntries.findIndex((e) => e.id === entry.id);
@@ -108,7 +111,7 @@ export class LocalStorageAdapter implements JournalStorage {
       return;
     }
 
-    const key = getStorageKey(date);
+    const key = this.getStorageKey(date);
     const existingEntries = await this.getEntries(date);
     const filteredEntries = existingEntries.filter((e) => e.id !== id);
 
@@ -124,7 +127,7 @@ export class LocalStorageAdapter implements JournalStorage {
       return;
     }
 
-    const key = getStorageKey(entry.date);
+    const key = this.getStorageKey(entry.date);
     const existingEntries = await this.getEntries(entry.date);
 
     // Check if entry already exists (don't duplicate)
@@ -142,8 +145,39 @@ export class LocalStorageAdapter implements JournalStorage {
       return;
     }
 
-    const key = getStorageKey(date);
+    const key = this.getStorageKey(date);
     localStorage.removeItem(key);
+  }
+
+  async replaceEntries(date: string, entries: JournalEntry[]): Promise<void> {
+    if (typeof window === "undefined" || !isLocalStorageAvailable()) return;
+
+    const key = this.getStorageKey(date);
+    if (entries.length === 0) {
+      localStorage.removeItem(key);
+      return;
+    }
+
+    localStorage.setItem(
+      key,
+      JSON.stringify([...entries].sort((a, b) => a.hour - b.hour))
+    );
+  }
+
+  async replaceAllDays(days: JournalDay[]): Promise<void> {
+    if (typeof window === "undefined" || !isLocalStorageAvailable()) return;
+
+    const keysToDelete: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key?.startsWith(this.storagePrefix)) continue;
+
+      const date = key.slice(this.storagePrefix.length);
+      if (DATE_PATTERN.test(date)) keysToDelete.push(key);
+    }
+
+    for (const key of keysToDelete) localStorage.removeItem(key);
+    for (const day of days) await this.replaceEntries(day.date, day.entries);
   }
 
   async getDay(date: string): Promise<JournalDay | null> {
@@ -175,17 +209,16 @@ export class LocalStorageAdapter implements JournalStorage {
     const keys: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith(STORAGE_PREFIX)) {
-        const date = key.replace(STORAGE_PREFIX, "");
-        // Skip special storage keys (trash, settings, etc.)
-        if (date === "trash") continue;
+      if (key && key.startsWith(this.storagePrefix)) {
+        const date = key.slice(this.storagePrefix.length);
+        if (!DATE_PATTERN.test(date)) continue;
         keys.push(key);
       }
     }
 
     // Now iterate over the collected date keys
     for (const key of keys) {
-      const date = key.replace(STORAGE_PREFIX, "");
+      const date = key.slice(this.storagePrefix.length);
       const entries = await this.getEntries(date);
 
       if (entries.length > 0) {
