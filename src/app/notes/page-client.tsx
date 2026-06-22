@@ -595,7 +595,7 @@ export default function NotesPage({
                 </div>
               ) : (
                 <ScrollArea className="flex-1">
-                  <div className="flex flex-col gap-4 md:gap-6 px-6 pb-6">
+                  <div className="flex flex-col gap-2 md:gap-0 px-6 pb-6">
                     {days.map((day) => {
                       const isToday = day.date === formatDate(new Date());
                       const preview = getDayPreview(day);
