@@ -16,13 +16,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useCallback, useState } from "react";
 import React from "react";
 
-import type { JournalDay } from "@/lib/types/journal";
-import type { Mood } from "@/lib/types/journal";
-import type { JournalEntry } from "@/lib/types/journal";
+import type { JournalDay, JournalEntry } from "@/lib/types/journal";
 
 import { AuthButton } from "@/components/auth/auth-button";
 import { EmptyState } from "@/components/empty-state";
-import { MoodBadge } from "@/components/mood-selector";
 import { BrailleLoader } from "@/components/ui/braille-spinner";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -75,6 +72,11 @@ export default function NotesPage({
     timeoutId: NodeJS.Timeout;
   } | null>(null);
   const [trashCount, setTrashCount] = useState(0);
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const hintRef = useRef<HTMLSpanElement>(null);
   const linkRef = useRef<HTMLAnchorElement>(null);
   // Swipe refs — no re-renders during gesture
@@ -389,6 +391,23 @@ export default function NotesPage({
     [animateSwipe, hideBg, startPendingDeletion]
   );
 
+  // Handle hover for tooltip
+  const handleMouseEnter = useCallback(
+    (e: React.MouseEvent, date: string) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setTooltipPos({
+        x: rect.left + rect.width / 2,
+        y: rect.bottom + 8,
+      });
+      setHoveredDate(date);
+    },
+    []
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    setHoveredDate(null);
+  }, []);
+
   if (loading) {
     return <BrailleLoader />;
   }
@@ -579,16 +598,20 @@ export default function NotesPage({
                   <div className="flex flex-col gap-2 md:gap-0 px-6 pb-6">
                     {days.map((day) => {
                       const isToday = day.date === formatDate(new Date());
-                      const dayMoods = day.entries
-                        .map((e) => e.mood)
-                        .filter(Boolean) as Mood[];
-                      const uniqueMoods = [...new Set(dayMoods)];
                       const preview = getDayPreview(day);
+                      const entriesWithContent = day.entries.filter(
+                        (e) => e.content.trim().length > 0
+                      );
+                      const entryCount = entriesWithContent.length;
 
                       return (
                         <div
                           key={day.date}
-                          className="relative overflow-hidden -mx-2 rounded-[4px]"
+                          className="relative -mx-2 rounded-[4px]"
+                          onMouseEnter={(e) =>
+                            !isToday && handleMouseEnter(e, day.date)
+                          }
+                          onMouseLeave={handleMouseLeave}
                           onClick={() => {
                             if (openSwipeDate.current === day.date) {
                               const el = swipeRefs.current[day.date];
@@ -634,36 +657,16 @@ export default function NotesPage({
                           >
                             <Link
                               href={`/notes/${day.date}`}
-                              className="flex min-h-11 min-w-0 flex-1 flex-col items-start justify-center py-2 transition-colors hover:text-muted-foreground"
+                              className="flex min-h-11 min-w-0 flex-1 items-center py-2 transition-colors hover:text-muted-foreground"
                               onClick={(e) => {
                                 if (openSwipeDate.current === day.date) {
                                   e.preventDefault();
                                 }
                               }}
                             >
-                              <span className="flex items-center gap-2 text-sm md:text-xl font-semibold">
+                              <span className="text-sm md:text-xl font-semibold">
                                 {formatDateDisplay(day.date)}
-                                {uniqueMoods.length > 0 && (
-                                  <span className="flex items-center gap-1">
-                                    {uniqueMoods.slice(0, 3).map((mood, i) => (
-                                      <MoodBadge key={i} mood={mood} />
-                                    ))}
-                                  </span>
-                                )}
                               </span>
-                              {preview && (
-                                <span className="hidden md:flex items-start gap-1.5 w-full max-h-0 opacity-0 overflow-hidden group-hover:max-h-14 group-hover:opacity-100 group-hover:pt-1 transition-all duration-200">
-                                  {preview.mood && (
-                                    <MoodBadge
-                                      mood={preview.mood}
-                                      className="shrink-0 mt-0.5"
-                                    />
-                                  )}
-                                  <span className="text-sm text-muted-foreground font-normal line-clamp-2">
-                                    {preview.text}
-                                  </span>
-                                </span>
-                              )}
                             </Link>
                             {isToday ? (
                               <span className="text-sm font-medium text-muted-foreground/40 px-3 select-none">
@@ -682,6 +685,34 @@ export default function NotesPage({
                               </Button>
                             )}
                           </div>
+
+                          {/* Hover Tooltip - Desktop only */}
+                          {hoveredDate === day.date && preview && (
+                            <div
+                              className="hidden md:block absolute z-50 w-72"
+                              style={{
+                                left: "50%",
+                                transform: "translateX(-50%)",
+                                top: "100%",
+                                marginTop: "8px",
+                              }}
+                            >
+                              <div className="bg-card rounded-xl border border-border/50 p-4 shadow-lg">
+                                {/* Preview text */}
+                                <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                                  {preview.text}
+                                </p>
+
+                                {/* Entry count */}
+                                <div className="mt-3 pt-3 border-t border-border/30">
+                                  <span className="text-xs text-muted-foreground">
+                                    {entryCount}{" "}
+                                    {entryCount === 1 ? "entry" : "entries"}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
