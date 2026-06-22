@@ -43,13 +43,6 @@ const SWIPE_THRESHOLD = 40;
 const VELOCITY_THRESHOLD = 0.4;
 const DEAD_ZONE = 10;
 
-type TooltipData = {
-  text: string;
-  entryCount: number;
-  x: number;
-  y: number;
-};
-
 export default function NotesPage({
   initialDays,
 }: {
@@ -79,7 +72,11 @@ export default function NotesPage({
     timeoutId: NodeJS.Timeout;
   } | null>(null);
   const [trashCount, setTrashCount] = useState(0);
-  const [tooltip, setTooltip] = useState<TooltipData | null>(null);
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const hintRef = useRef<HTMLSpanElement>(null);
   const linkRef = useRef<HTMLAnchorElement>(null);
   // Swipe refs — no re-renders during gesture
@@ -90,13 +87,14 @@ export default function NotesPage({
     startX: number;
     startY: number;
     currentX: number;
-    locked: boolean | null;
+    locked: boolean | null; // null = undecided, true = horizontal, false = vertical
     startTime: number;
     lastX: number;
     lastTime: number;
   } | null>(null);
   const openSwipeDate = useRef<string | null>(null);
   const previousSyncStatus = useRef(syncStatus);
+  // Calculate days in current month for calendar view
   const today = new Date();
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
@@ -139,11 +137,13 @@ export default function NotesPage({
     }
   }, [loadAllDays, storageLoading, syncStatus]);
 
+  // Swipe hint — show on every page load, animated via direct DOM manipulation
   useEffect(() => {
     const link = linkRef.current;
     const hint = hintRef.current;
     if (!link || !hint) return;
 
+    // Phase 1: after 1.5s, crossfade "Resume Journal" → "Swipe left to delete"
     const t1 = setTimeout(() => {
       link.style.opacity = "0";
       link.style.transform = "translateY(-8px)";
@@ -151,6 +151,7 @@ export default function NotesPage({
       hint.style.transform = "translateY(0)";
     }, 1500);
 
+    // Phase 2: after 4.5s, crossfade back
     const t2 = setTimeout(() => {
       link.style.opacity = "1";
       link.style.transform = "translateY(0)";
@@ -174,9 +175,13 @@ export default function NotesPage({
     const dayToDelete = days.find((d) => d.date === date);
     if (!dayToDelete) return;
 
+    // Move to trash immediately
     await trashStorage.addToTrash(dayToDelete);
+
+    // Delete from main storage
     await storage.deleteDay(date);
 
+    // Show toast with undo
     const entriesWithContent = dayToDelete.entries.filter(
       (e) => e.content.trim().length > 0
     );
@@ -193,16 +198,21 @@ export default function NotesPage({
       },
     });
 
+    // Optimistically update UI
     setDays((prev) => prev.filter((d) => d.date !== date));
     await loadTrashCount();
   };
 
   const handleUndoRestore = async (date: string, entries: JournalEntry[]) => {
+    // Restore all entries from trash
     for (const entry of entries) {
       await trashStorage.restoreEntryToStorage(entry);
     }
 
+    // Remove from trash
     await trashStorage.permanentlyDelete(date);
+
+    // Reload days to show restored entry
     await loadAllDays();
     await loadTrashCount();
 
@@ -215,6 +225,7 @@ export default function NotesPage({
 
   const handleConfirmDelete = async () => {
     if (selectedDateToDelete) {
+      // Clear any pending deletion for this date
       if (pendingDeletion?.date === selectedDateToDelete) {
         clearTimeout(pendingDeletion.timeoutId);
         setPendingDeletion(null);
@@ -226,6 +237,7 @@ export default function NotesPage({
     }
   };
 
+  // Show/hide the red background for a given date
   const showBg = useCallback((date: string) => {
     const bg = bgRefs.current[date];
     if (bg) bg.style.visibility = "visible";
@@ -236,6 +248,7 @@ export default function NotesPage({
     if (bg) bg.style.visibility = "hidden";
   }, []);
 
+  // Animate an element's transform with spring-like easing
   const animateSwipe = useCallback(
     (el: HTMLDivElement, targetX: number, onDone?: () => void) => {
       el.style.transition =
@@ -251,6 +264,7 @@ export default function NotesPage({
     []
   );
 
+  // Close any previously open swipe
   const closeOpenSwipe = useCallback(
     (exceptDate?: string) => {
       const prev = openSwipeDate.current;
@@ -286,29 +300,37 @@ export default function NotesPage({
       const dx = touch.clientX - swipe.startX;
       const dy = touch.clientY - swipe.startY;
 
+      // Decide direction lock within the dead zone
       if (swipe.locked === null) {
         if (Math.abs(dx) < DEAD_ZONE && Math.abs(dy) < DEAD_ZONE) return;
         swipe.locked = Math.abs(dx) > Math.abs(dy);
         if (!swipe.locked) {
+          // Vertical scroll — bail out
           activeSwipe.current = null;
           return;
         }
+        // Close any other open swipe when starting a new one
         closeOpenSwipe(swipe.date);
+        // Show the red background for this item
         showBg(swipe.date);
       }
 
+      // Track velocity
       swipe.lastX = touch.clientX;
       swipe.lastTime = Date.now();
 
       const el = swipeRefs.current[swipe.date];
       if (!el) return;
 
+      // Calculate offset: negative = swiped left
       const isAlreadyOpen = openSwipeDate.current === swipe.date;
       const baseOffset = isAlreadyOpen ? -SWIPE_ACTION_WIDTH : 0;
       let offset = baseOffset + dx;
 
+      // Clamp: don't allow right swipe past 0
       if (offset > 0) offset = 0;
 
+      // Rubber-band resistance past the action width
       if (offset < -SWIPE_ACTION_WIDTH) {
         const over = -offset - SWIPE_ACTION_WIDTH;
         offset = -(SWIPE_ACTION_WIDTH + over * 0.3);
@@ -332,17 +354,20 @@ export default function NotesPage({
 
       const dx = swipe.currentX - swipe.startX;
       const dt = Math.max(1, swipe.lastTime - swipe.startTime);
-      const velocity = Math.abs(dx) / dt;
+      const velocity = Math.abs(dx) / dt; // px/ms
       const isAlreadyOpen = openSwipeDate.current === date;
       const totalOffset = (isAlreadyOpen ? -SWIPE_ACTION_WIDTH : 0) + dx;
 
+      // Fast flick left or past threshold = open/trigger
       const shouldOpen =
         totalOffset < -SWIPE_THRESHOLD ||
         (velocity > VELOCITY_THRESHOLD && dx < 0);
+      // Fast flick right or within threshold = close
       const shouldClose =
         !shouldOpen || (velocity > VELOCITY_THRESHOLD && dx > 0);
 
       if (shouldOpen && !shouldClose) {
+        // If swiped well past the action width with velocity, auto-trigger delete
         if (
           totalOffset < -(SWIPE_ACTION_WIDTH * 1.2) ||
           (velocity > 0.8 && dx < -SWIPE_ACTION_WIDTH)
@@ -353,10 +378,12 @@ export default function NotesPage({
           });
           startPendingDeletion(date);
         } else {
+          // Snap to open position
           animateSwipe(el, -SWIPE_ACTION_WIDTH);
           openSwipeDate.current = date;
         }
       } else {
+        // Snap closed
         animateSwipe(el, 0, () => hideBg(date));
         openSwipeDate.current = null;
       }
@@ -364,36 +391,28 @@ export default function NotesPage({
     [animateSwipe, hideBg, startPendingDeletion]
   );
 
-  // Handle hover for tooltip — use fixed positioning outside scroll
+  // Handle hover for tooltip
   const handleMouseEnter = useCallback(
-    (e: React.MouseEvent, day: JournalDay) => {
+    (e: React.MouseEvent, date: string) => {
       const rect = e.currentTarget.getBoundingClientRect();
-      const preview = getDayPreview(day);
-      const entriesWithContent = day.entries.filter(
-        (entry) => entry.content.trim().length > 0
-      );
-      const entryCount = entriesWithContent.length;
-
-      if (!preview) return;
-
-      setTooltip({
-        text: preview.text,
-        entryCount,
+      setTooltipPos({
         x: rect.left + rect.width / 2,
         y: rect.bottom + 8,
       });
+      setHoveredDate(date);
     },
     []
   );
 
   const handleMouseLeave = useCallback(() => {
-    setTooltip(null);
+    setHoveredDate(null);
   }, []);
 
   if (loading) {
     return <BrailleLoader />;
   }
 
+  // Calendar View Component
   const CalendarView = () => (
     <div className="flex flex-col items-center flex-1 py-3 w-full max-w-full">
       <div className="grid w-full grid-cols-7 place-items-center gap-x-1 gap-y-2 px-6 sm:grid-cols-9 sm:gap-x-4 md:grid-cols-11 md:gap-6 lg:grid-cols-13">
@@ -410,32 +429,14 @@ export default function NotesPage({
               className={`group flex size-11 items-center justify-center rounded-full ${
                 hasEntry ? "cursor-pointer" : "cursor-default"
               }`}
+              title={
+                hasEntry ? `Note for ${formatDateDisplay(dateStr)}` : undefined
+              }
               aria-label={
                 hasEntry
                   ? `Open note for ${formatDateDisplay(dateStr)}`
                   : `No note for day ${dayNum}`
               }
-              onMouseEnter={(e) => {
-                if (hasEntry) {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const matchedDay = days.find((d) => d.date === dateStr);
-                  if (matchedDay) {
-                    const preview = getDayPreview(matchedDay);
-                    const entriesWithContent = matchedDay.entries.filter(
-                      (entry) => entry.content.trim().length > 0
-                    );
-                    if (preview) {
-                      setTooltip({
-                        text: preview.text,
-                        entryCount: entriesWithContent.length,
-                        x: rect.left + rect.width / 2,
-                        y: rect.bottom + 8,
-                      });
-                    }
-                  }
-                }
-              }}
-              onMouseLeave={handleMouseLeave}
             >
               <span
                 className={`relative block size-[15px] rounded-full transition-all duration-500 ease-in-out ${
@@ -455,6 +456,7 @@ export default function NotesPage({
           );
         })}
       </div>
+      {/* Helper text below the grid */}
       <p className="text-[11px] text-muted-foreground/45 tracking-wide italic mt-6 text-center">
         Orange dots mark days with captured notes
       </p>
@@ -472,6 +474,7 @@ export default function NotesPage({
             </h1>
 
             <div className="flex items-center gap-2">
+              {/* Mode Selection Toggle */}
               <div className="flex items-center gap-1 bg-muted/20 p-1 rounded-xl ring-1 ring-border/30">
                 <Button
                   variant="ghost"
@@ -503,6 +506,7 @@ export default function NotesPage({
                 </Button>
               </div>
 
+              {/* Settings Menu - Mobile only */}
               <div className="md:hidden">
                 <Popover>
                   <PopoverTrigger
@@ -515,6 +519,7 @@ export default function NotesPage({
                   </PopoverTrigger>
                   <PopoverContent align="end" className="w-44 p-1 rounded-lg">
                     <div className="flex flex-col">
+                      {/* Theme Toggle */}
                       <button
                         onClick={() => setTheme(isDark ? "light" : "dark")}
                         className="flex items-center gap-2 w-full px-2.5 py-2 rounded-md hover:bg-accent/50 transition-colors text-left"
@@ -529,6 +534,7 @@ export default function NotesPage({
                         </span>
                       </button>
 
+                      {/* Trash Link */}
                       <Link href="/notes/trash">
                         <button className="flex items-center gap-2 w-full px-2.5 py-2 rounded-md hover:bg-accent/50 transition-colors text-left">
                           <div className="relative">
@@ -543,12 +549,16 @@ export default function NotesPage({
                         </button>
                       </Link>
 
+                      {/* Divider */}
                       <div className="h-px bg-border mx-2 my-0.5" />
 
+                      {/* Auth */}
                       <AuthButton variant="mobile" />
 
+                      {/* Divider */}
                       <div className="h-px bg-border mx-2 my-0.5" />
 
+                      {/* Info */}
                       <div className="px-2.5 py-1.5">
                         <div className="flex items-start gap-2 text-muted-foreground">
                           <IconInfoCircle className="h-4 w-4 shrink-0 mt-0.5" />
@@ -575,6 +585,8 @@ export default function NotesPage({
 
         {/* Content Section */}
         <div className="flex-1 min-h-0 flex flex-col mt-3 pb-[140px]">
+          {" "}
+          {/* Added padding at bottom to clear the fixed footer */}
           <div className="flex-1 min-h-0">
             {viewMode === "list" ? (
               days.length === 0 ? (
@@ -586,13 +598,18 @@ export default function NotesPage({
                   <div className="flex flex-col gap-2 md:gap-0 px-6 pb-6">
                     {days.map((day) => {
                       const isToday = day.date === formatDate(new Date());
+                      const preview = getDayPreview(day);
+                      const entriesWithContent = day.entries.filter(
+                        (e) => e.content.trim().length > 0
+                      );
+                      const entryCount = entriesWithContent.length;
 
                       return (
                         <div
                           key={day.date}
                           className="relative -mx-2 rounded-[4px]"
                           onMouseEnter={(e) =>
-                            !isToday && handleMouseEnter(e, day)
+                            !isToday && handleMouseEnter(e, day.date)
                           }
                           onMouseLeave={handleMouseLeave}
                           onClick={() => {
@@ -604,6 +621,7 @@ export default function NotesPage({
                             }
                           }}
                         >
+                          {/* Red delete background - hidden by default, shown via JS during swipe */}
                           {!isToday && (
                             <div
                               ref={(el) => {
@@ -625,6 +643,7 @@ export default function NotesPage({
                             </div>
                           )}
 
+                          {/* Content layer - swipeable on mobile */}
                           <div
                             ref={(el) => {
                               swipeRefs.current[day.date] = el;
@@ -654,6 +673,7 @@ export default function NotesPage({
                                 Today
                               </span>
                             ) : (
+                              /* Desktop delete button - only visible on hover on md+ screens */
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -665,6 +685,34 @@ export default function NotesPage({
                               </Button>
                             )}
                           </div>
+
+                          {/* Hover Tooltip - Desktop only */}
+                          {hoveredDate === day.date && preview && (
+                            <div
+                              className="hidden md:block absolute z-50 w-72"
+                              style={{
+                                left: "50%",
+                                transform: "translateX(-50%)",
+                                top: "100%",
+                                marginTop: "8px",
+                              }}
+                            >
+                              <div className="bg-card rounded-xl border border-border/50 p-4 shadow-lg">
+                                {/* Preview text */}
+                                <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                                  {preview.text}
+                                </p>
+
+                                {/* Entry count */}
+                                <div className="mt-3 pt-3 border-t border-border/30">
+                                  <span className="text-xs text-muted-foreground">
+                                    {entryCount}{" "}
+                                    {entryCount === 1 ? "entry" : "entries"}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -685,37 +733,15 @@ export default function NotesPage({
             </div>
             <Link href="/">
               <div className="group relative flex min-h-11 items-center justify-center overflow-hidden rounded-full bg-[#1a1a1a] px-5 py-2.5 text-[13px] font-medium text-white shadow-[0_4px_14px_rgba(0,0,0,0.25)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.35)] active:translate-y-0 active:scale-[0.96] dark:bg-[#2a2a2a]">
+                {/* Subtle gradient overlay for depth */}
                 <span className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                {/* Jelly bounce animation on press */}
                 <span className="relative z-10">Resume Journal</span>
               </div>
             </Link>
           </div>
         </div>
       </div>
-
-      {/* Fixed Tooltip - rendered outside scroll container */}
-      {tooltip && (
-        <div
-          className="fixed z-[9999] pointer-events-none hidden md:block"
-          style={{
-            left: `${tooltip.x}px`,
-            top: `${tooltip.y}px`,
-            transform: "translateX(-50%)",
-          }}
-        >
-          <div className="w-72 bg-card rounded-xl border border-border/50 p-4 shadow-lg">
-            <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-              {tooltip.text}
-            </p>
-            <div className="mt-3 pt-3 border-t border-border/30">
-              <span className="text-xs text-muted-foreground">
-                {tooltip.entryCount}{" "}
-                {tooltip.entryCount === 1 ? "entry" : "entries"}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
 
       <ConfirmDialog
         isOpen={deleteDialogOpen}
