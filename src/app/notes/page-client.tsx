@@ -16,13 +16,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useCallback, useState } from "react";
 import React from "react";
 
-import type { JournalDay } from "@/lib/types/journal";
-import type { Mood } from "@/lib/types/journal";
-import type { JournalEntry } from "@/lib/types/journal";
+import type { JournalDay, JournalEntry } from "@/lib/types/journal";
 
 import { AuthButton } from "@/components/auth/auth-button";
 import { EmptyState } from "@/components/empty-state";
-import { MoodBadge } from "@/components/mood-selector";
 import { BrailleLoader } from "@/components/ui/braille-spinner";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -576,19 +573,20 @@ export default function NotesPage({
                 </div>
               ) : (
                 <ScrollArea className="flex-1">
-                  <div className="flex flex-col gap-2 md:gap-0 px-6 pb-6">
+                  {/* Bento Grid Layout */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-6 pb-6">
                     {days.map((day) => {
                       const isToday = day.date === formatDate(new Date());
-                      const dayMoods = day.entries
-                        .map((e) => e.mood)
-                        .filter(Boolean) as Mood[];
-                      const uniqueMoods = [...new Set(dayMoods)];
                       const preview = getDayPreview(day);
+                      const entriesWithContent = day.entries.filter(
+                        (e) => e.content.trim().length > 0
+                      );
+                      const entryCount = entriesWithContent.length;
 
                       return (
                         <div
                           key={day.date}
-                          className="relative overflow-hidden -mx-2 rounded-[4px]"
+                          className="relative group"
                           onClick={() => {
                             if (openSwipeDate.current === day.date) {
                               const el = swipeRefs.current[day.date];
@@ -604,7 +602,7 @@ export default function NotesPage({
                               ref={(el) => {
                                 bgRefs.current[day.date] = el;
                               }}
-                              className="absolute right-0 top-0 bottom-0 w-[80px] bg-destructive flex items-center justify-center rounded-r-[4px] md:hidden"
+                              className="absolute right-0 top-0 bottom-0 w-[80px] bg-destructive flex items-center justify-center rounded-r-xl md:hidden z-0"
                               style={{ visibility: "hidden" }}
                             >
                               <button
@@ -620,68 +618,83 @@ export default function NotesPage({
                             </div>
                           )}
 
-                          {/* Content layer - swipeable on mobile */}
+                          {/* Card */}
                           <div
                             ref={(el) => {
                               swipeRefs.current[day.date] = el;
                             }}
-                            className="group flex items-center justify-between py-1 px-2 bg-background md:hover:bg-accent/35 relative rounded-[4px]"
+                            className="relative bg-card rounded-xl border border-border/50 p-4 h-full 
+                                       transition-all duration-200 
+                                       hover:shadow-md hover:border-border/80
+                                       cursor-pointer min-h-[160px] flex flex-col z-10"
                             onTouchStart={(e) =>
                               !isToday && onTouchStart(e, day.date)
                             }
                             onTouchMove={(e) => !isToday && onTouchMove(e)}
                             onTouchEnd={() => !isToday && onTouchEnd(day.date)}
                           >
-                            <Link
-                              href={`/notes/${day.date}`}
-                              className="flex min-h-11 min-w-0 flex-1 flex-col items-start justify-center py-2 transition-colors hover:text-muted-foreground"
-                              onClick={(e) => {
-                                if (openSwipeDate.current === day.date) {
-                                  e.preventDefault();
-                                }
-                              }}
-                            >
-                              <span className="flex items-center gap-2 text-sm md:text-xl font-semibold">
-                                {formatDateDisplay(day.date)}
-                                {uniqueMoods.length > 0 && (
-                                  <span className="flex items-center gap-1">
-                                    {uniqueMoods.slice(0, 3).map((mood, i) => (
-                                      <MoodBadge key={i} mood={mood} />
-                                    ))}
-                                  </span>
-                                )}
-                              </span>
-                              {preview && (
-                                <span className="hidden md:flex items-start gap-1.5 w-full max-h-0 opacity-0 overflow-hidden group-hover:max-h-14 group-hover:opacity-100 group-hover:pt-1 transition-all duration-200">
-                                  {preview.mood && (
-                                    <MoodBadge
-                                      mood={preview.mood}
-                                      className="shrink-0 mt-0.5"
-                                    />
-                                  )}
-                                  <span className="text-sm text-muted-foreground font-normal line-clamp-2">
-                                    {preview.text}
-                                  </span>
-                                </span>
+                            {/* Header */}
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                  {formatDateDisplay(day.date).split(",")[0]}
+                                </div>
+                                <div className="text-lg font-semibold mt-0.5">
+                                  {formatDateDisplay(day.date)
+                                    .split(",")[1]
+                                    ?.trim()}
+                                </div>
+                              </div>
+
+                              {/* Delete button - visible on hover */}
+                              {!isToday && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={(e) => handleDeleteClick(e, day.date)}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity 
+                                             text-muted-foreground hover:text-destructive hover:bg-destructive/10
+                                             h-8 w-8"
+                                >
+                                  <IconTrash stroke={1.5} className="h-4 w-4" />
+                                  <span className="sr-only">Delete</span>
+                                </Button>
                               )}
-                            </Link>
-                            {isToday ? (
-                              <span className="text-sm font-medium text-muted-foreground/40 px-3 select-none">
-                                Today
+                            </div>
+
+                            {/* Preview */}
+                            {preview && (
+                              <div className="flex-1 min-h-0 mt-2">
+                                <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                                  {preview.text}
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Footer */}
+                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/30">
+                              <span className="text-xs text-muted-foreground">
+                                {entryCount}{" "}
+                                {entryCount === 1 ? "entry" : "entries"}
                               </span>
-                            ) : (
-                              /* Desktop delete button - only visible on hover on md+ screens */
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => handleDeleteClick(e, day.date)}
-                                className="hidden md:flex opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                              >
-                                <IconTrash stroke={1.5} className="h-5 w-5" />
-                                <span className="sr-only">Delete</span>
-                              </Button>
+                            </div>
+
+                            {/* Today badge */}
+                            {isToday && (
+                              <div className="absolute top-3 right-3">
+                                <span className="text-xs font-medium text-muted-foreground/60 bg-muted/50 px-2 py-0.5 rounded-full">
+                                  Today
+                                </span>
+                              </div>
                             )}
                           </div>
+
+                          {/* Link overlay */}
+                          <Link
+                            href={`/notes/${day.date}`}
+                            className="absolute inset-0 z-20"
+                            aria-label={`Open entries for ${formatDateDisplay(day.date)}`}
+                          />
                         </div>
                       );
                     })}
