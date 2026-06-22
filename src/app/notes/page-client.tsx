@@ -48,6 +48,7 @@ type TooltipData = {
   entryCount: number;
   x: number;
   y: number;
+  isCalendar?: boolean;
 };
 
 export default function NotesPage({
@@ -410,14 +411,24 @@ export default function NotesPage({
               className={`group flex size-11 items-center justify-center rounded-full ${
                 hasEntry ? "cursor-pointer" : "cursor-default"
               }`}
-              title={
-                hasEntry ? `Note for ${formatDateDisplay(dateStr)}` : undefined
-              }
               aria-label={
                 hasEntry
                   ? `Open note for ${formatDateDisplay(dateStr)}`
                   : `No note for day ${dayNum}`
               }
+              onMouseEnter={(e) => {
+                if (hasEntry) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setTooltip({
+                    text: `Note for ${formatDateDisplay(dateStr)}`,
+                    entryCount: 0,
+                    x: rect.left + rect.width / 2,
+                    y: rect.bottom + 8,
+                    isCalendar: true,
+                  });
+                }
+              }}
+              onMouseLeave={handleMouseLeave}
             >
               <span
                 className={`relative block size-[15px] rounded-full transition-all duration-500 ease-in-out ${
@@ -678,24 +689,34 @@ export default function NotesPage({
       {/* Fixed Tooltip - rendered outside scroll container */}
       {tooltip && (
         <div
-          className="fixed z-[9999] w-72 pointer-events-none hidden md:block"
+          className="fixed z-[9999] pointer-events-none hidden md:block"
           style={{
             left: `${tooltip.x}px`,
             top: `${tooltip.y}px`,
             transform: "translateX(-50%)",
           }}
         >
-          <div className="bg-card rounded-xl border border-border/50 p-4 shadow-lg">
-            <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-              {tooltip.text}
-            </p>
-            <div className="mt-3 pt-3 border-t border-border/30">
-              <span className="text-xs text-muted-foreground">
-                {tooltip.entryCount}{" "}
-                {tooltip.entryCount === 1 ? "entry" : "entries"}
-              </span>
+          {tooltip.isCalendar ? (
+            /* Calendar dot tooltip - compact */
+            <div className="bg-card rounded-lg border border-border/50 px-3 py-2 shadow-lg">
+              <p className="text-xs text-muted-foreground whitespace-nowrap">
+                {tooltip.text}
+              </p>
             </div>
-          </div>
+          ) : (
+            /* List item tooltip - bento style */
+            <div className="w-72 bg-card rounded-xl border border-border/50 p-4 shadow-lg">
+              <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                {tooltip.text}
+              </p>
+              <div className="mt-3 pt-3 border-t border-border/30">
+                <span className="text-xs text-muted-foreground">
+                  {tooltip.entryCount}{" "}
+                  {tooltip.entryCount === 1 ? "entry" : "entries"}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
