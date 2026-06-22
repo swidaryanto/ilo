@@ -48,7 +48,6 @@ type TooltipData = {
   entryCount: number;
   x: number;
   y: number;
-  isCalendar?: boolean;
 };
 
 export default function NotesPage({
@@ -419,13 +418,21 @@ export default function NotesPage({
               onMouseEnter={(e) => {
                 if (hasEntry) {
                   const rect = e.currentTarget.getBoundingClientRect();
-                  setTooltip({
-                    text: `Note for ${formatDateDisplay(dateStr)}`,
-                    entryCount: 0,
-                    x: rect.left + rect.width / 2,
-                    y: rect.bottom + 8,
-                    isCalendar: true,
-                  });
+                  const matchedDay = days.find((d) => d.date === dateStr);
+                  if (matchedDay) {
+                    const preview = getDayPreview(matchedDay);
+                    const entriesWithContent = matchedDay.entries.filter(
+                      (entry) => entry.content.trim().length > 0
+                    );
+                    if (preview) {
+                      setTooltip({
+                        text: preview.text,
+                        entryCount: entriesWithContent.length,
+                        x: rect.left + rect.width / 2,
+                        y: rect.bottom + 8,
+                      });
+                    }
+                  }
                 }
               }}
               onMouseLeave={handleMouseLeave}
@@ -696,27 +703,17 @@ export default function NotesPage({
             transform: "translateX(-50%)",
           }}
         >
-          {tooltip.isCalendar ? (
-            /* Calendar dot tooltip - compact */
-            <div className="bg-card rounded-lg border border-border/50 px-3 py-2 shadow-lg">
-              <p className="text-xs text-muted-foreground whitespace-nowrap">
-                {tooltip.text}
-              </p>
+          <div className="w-72 bg-card rounded-xl border border-border/50 p-4 shadow-lg">
+            <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+              {tooltip.text}
+            </p>
+            <div className="mt-3 pt-3 border-t border-border/30">
+              <span className="text-xs text-muted-foreground">
+                {tooltip.entryCount}{" "}
+                {tooltip.entryCount === 1 ? "entry" : "entries"}
+              </span>
             </div>
-          ) : (
-            /* List item tooltip - bento style */
-            <div className="w-72 bg-card rounded-xl border border-border/50 p-4 shadow-lg">
-              <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                {tooltip.text}
-              </p>
-              <div className="mt-3 pt-3 border-t border-border/30">
-                <span className="text-xs text-muted-foreground">
-                  {tooltip.entryCount}{" "}
-                  {tooltip.entryCount === 1 ? "entry" : "entries"}
-                </span>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       )}
 
