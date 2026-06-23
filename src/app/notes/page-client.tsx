@@ -73,9 +73,10 @@ export default function NotesPage({
   } | null>(null);
   const [trashCount, setTrashCount] = useState(0);
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
-  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number; showAbove: boolean }>({
     x: 0,
     y: 0,
+    showAbove: false,
   });
   const hintRef = useRef<HTMLSpanElement>(null);
   const linkRef = useRef<HTMLAnchorElement>(null);
@@ -395,9 +396,14 @@ export default function NotesPage({
   const handleMouseEnter = useCallback(
     (e: React.MouseEvent, date: string) => {
       const rect = e.currentTarget.getBoundingClientRect();
+      const TOOLTIP_GAP = 8;
+      const TOOLTIP_EST_HEIGHT = 160;
+      const spaceAbove = rect.top;
+      const showAbove = spaceAbove >= TOOLTIP_EST_HEIGHT + TOOLTIP_GAP;
       setTooltipPos({
         x: rect.left + rect.width / 2,
-        y: rect.bottom + 8,
+        y: showAbove ? rect.top - TOOLTIP_GAP : rect.bottom + TOOLTIP_GAP,
+        showAbove,
       });
       setHoveredDate(date);
     },
@@ -689,12 +695,13 @@ export default function NotesPage({
                           {/* Hover Tooltip - Desktop only */}
                           {hoveredDate === day.date && preview && (
                             <div
-                              className="hidden md:block absolute z-50 w-72"
+                              className="hidden md:block fixed z-[100] w-72 pointer-events-none"
                               style={{
-                                left: "50%",
-                                transform: "translateX(-50%)",
-                                bottom: "100%",
-                                marginBottom: "8px",
+                                left: tooltipPos.x,
+                                top: tooltipPos.y,
+                                transform: tooltipPos.showAbove
+                                  ? "translateX(-50%) translateY(-100%)"
+                                  : "translateX(-50%)",
                               }}
                             >
                               <div className="bg-card rounded-xl border border-border/50 p-4 shadow-lg">
