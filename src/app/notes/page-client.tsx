@@ -426,14 +426,31 @@ export default function NotesPage({
               className={`group flex size-11 items-center justify-center rounded-full ${
                 hasEntry ? "cursor-pointer" : "cursor-default"
               }`}
-              title={
-                hasEntry ? `Note for ${formatDateDisplay(dateStr)}` : undefined
-              }
               aria-label={
                 hasEntry
                   ? `Open note for ${formatDateDisplay(dateStr)}`
                   : `No note for day ${dayNum}`
               }
+              onMouseEnter={(e) => {
+                if (hasEntry) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const matchedDay = days.find((d) => d.date === dateStr);
+                  if (matchedDay) {
+                    const preview = getDayPreview(matchedDay);
+                    if (preview) {
+                      const entriesWithContent = matchedDay.entries.filter(
+                        (entry) => entry.content.trim().length > 0
+                      );
+                      setTooltipPos({
+                        x: rect.left + rect.width / 2,
+                        y: rect.bottom + 8,
+                      });
+                      setHoveredDate(dateStr);
+                    }
+                  }
+                }
+              }}
+              onMouseLeave={handleMouseLeave}
             >
               <span
                 className={`relative block size-[15px] rounded-full transition-all duration-500 ease-in-out ${
@@ -717,6 +734,41 @@ export default function NotesPage({
               )
             ) : (
               <CalendarView />
+              {/* Calendar dot tooltip - Desktop only */}
+              {hoveredDate &&
+                (() => {
+                  const matchedDay = days.find((d) => d.date === hoveredDate);
+                  if (!matchedDay) return null;
+                  const preview = getDayPreview(matchedDay);
+                  if (!preview) return null;
+                  const entriesWithContent = matchedDay.entries.filter(
+                    (e) => e.content.trim().length > 0
+                  );
+                  const entryCount = entriesWithContent.length;
+                  return (
+                    <div
+                      key="calendar-tooltip"
+                      className="hidden md:block fixed z-[100] w-72 pointer-events-none"
+                      style={{
+                        left: tooltipPos.x,
+                        top: tooltipPos.y,
+                        transform: "translateX(-50%)",
+                      }}
+                    >
+                      <div className="bg-card rounded-xl border border-border/50 p-4 shadow-lg">
+                        <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                          {preview.text}
+                        </p>
+                        <div className="mt-3 pt-3 border-t border-border/30">
+                          <span className="text-xs text-muted-foreground">
+                            {entryCount}{" "}
+                            {entryCount === 1 ? "entry" : "entries"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
             )}
           </div>
         </div>
