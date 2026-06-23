@@ -693,8 +693,8 @@ export default function NotesPage({
                               style={{
                                 left: "50%",
                                 transform: "translateX(-50%)",
-                                bottom: "100%",
-                                marginBottom: "8px",
+                                top: "100%",
+                                marginTop: "8px",
                               }}
                             >
                               <div className="bg-card rounded-xl border border-border/50 p-4 shadow-lg">
