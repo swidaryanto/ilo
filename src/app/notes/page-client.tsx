@@ -395,10 +395,7 @@ export default function NotesPage({
   const handleMouseEnter = useCallback(
     (e: React.MouseEvent, date: string) => {
       const rect = e.currentTarget.getBoundingClientRect();
-      setTooltipPos({
-        x: rect.left + rect.width / 2,
-        y: rect.bottom + 8,
-      });
+      setTooltipPos({ x: rect.left + rect.width / 2, y: rect.bottom + 8 });
       setHoveredDate(date);
     },
     []
@@ -689,12 +686,11 @@ export default function NotesPage({
                           {/* Hover Tooltip - Desktop only */}
                           {hoveredDate === day.date && preview && (
                             <div
-                              className="hidden md:block absolute z-50 w-72"
+                              className="hidden md:block fixed z-[100] w-72 pointer-events-none"
                               style={{
-                                left: "50%",
+                                left: tooltipPos.x,
+                                top: tooltipPos.y,
                                 transform: "translateX(-50%)",
-                                top: "100%",
-                                marginTop: "8px",
                               }}
                             >
                               <div className="bg-card rounded-xl border border-border/50 p-4 shadow-lg">
