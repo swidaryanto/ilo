@@ -775,22 +775,24 @@ export default function NotesPage({
           </div>
         </div>
 
-        {/* Fixed Bottom Footer */}
-        <div className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-4xl border-t border-transparent bg-background/80 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur-md">
-          <div className="flex items-center justify-between w-full px-6 md:max-w-[492px] md:mx-auto md:px-0">
-            <div className="text-[13px] font-medium text-muted-foreground">
-              {currentDateDisplay}
-            </div>
-            <Link href="/">
-              <div className="group relative flex min-h-11 items-center justify-center overflow-hidden rounded-full bg-[#1a1a1a] px-5 py-2.5 text-[13px] font-medium text-white shadow-[0_4px_14px_rgba(0,0,0,0.25)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.35)] active:translate-y-0 active:scale-[0.96] dark:bg-[#2a2a2a]">
-                {/* Subtle gradient overlay for depth */}
-                <span className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                {/* Jelly bounce animation on press */}
-                <span className="relative z-10">Resume Journal</span>
+        {/* Resume footer is unnecessary when the journal has no entries. */}
+        {days.length > 0 && (
+          <div className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-4xl border-t border-transparent bg-background/80 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur-md">
+            <div className="flex items-center justify-between w-full px-6 md:max-w-[492px] md:mx-auto md:px-0">
+              <div className="text-[13px] font-medium text-muted-foreground">
+                {currentDateDisplay}
               </div>
-            </Link>
+              <Link href="/">
+                <div className="group relative flex min-h-11 items-center justify-center overflow-hidden rounded-full bg-[#1a1a1a] px-5 py-2.5 text-[13px] font-medium text-white shadow-[0_4px_14px_rgba(0,0,0,0.25)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.35)] active:translate-y-0 active:scale-[0.96] dark:bg-[#2a2a2a]">
+                  {/* Subtle gradient overlay for depth */}
+                  <span className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  {/* Jelly bounce animation on press */}
+                  <span className="relative z-10">Resume Journal</span>
+                </div>
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <ConfirmDialog
