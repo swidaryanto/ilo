@@ -38,36 +38,31 @@ export function EmptyState({
 
       {/* Title */}
       <h3 className="text-lg font-semibold text-foreground mb-2">
-        {isJournal ? "Your day is a blank canvas" : "No entries yet"}
+        {isJournal ? "Your day is a blank canvas" : "Start with one thought"}
       </h3>
 
       {/* Description */}
       <p className="text-sm text-muted-foreground max-w-[260px] mb-6 leading-relaxed">
         {isJournal
           ? "Capture your thoughts hour by hour. Start with the current time or any moment that comes to mind."
-          : "Your journal is waiting for its first story. Every entry becomes a memory worth keeping."}
+          : "Capture one moment from today. You can always come back and add more."}
       </p>
 
-      {/* Action hint */}
-      <div
-        className={cn(
-          "flex items-center gap-2 text-xs font-medium",
-          isJournal
-            ? "text-orange-500 dark:text-orange-400"
-            : "text-muted-foreground"
-        )}
-      >
-        {isJournal ? (
-          <>
-            <span>Scroll to find your hour</span>
-            <IconArrowRight className="w-3 h-3" />
-          </>
-        ) : (
-          <>
-            <span>Tap the button below to start writing</span>
-          </>
-        )}
-      </div>
+      {isJournal ? (
+        <div className="flex items-center gap-2 text-xs font-medium text-orange-500 dark:text-orange-400">
+          <span>Scroll to find your hour</span>
+          <IconArrowRight className="w-3 h-3" />
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={onAction}
+          className="mt-1 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-foreground px-5 text-sm font-medium text-background shadow-sm transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <span>Write your first note</span>
+          <IconArrowRight className="h-4 w-4" />
+        </button>
+      )}
 
       {/* Suggested prompts for journal */}
       {isJournal && (

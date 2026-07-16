@@ -392,14 +392,11 @@ export default function NotesPage({
   );
 
   // Handle hover for tooltip
-  const handleMouseEnter = useCallback(
-    (e: React.MouseEvent, date: string) => {
-      const rect = e.currentTarget.getBoundingClientRect();
-      setTooltipPos({ x: rect.left + rect.width / 2, y: rect.bottom + 8 });
-      setHoveredDate(date);
-    },
-    []
-  );
+  const handleMouseEnter = useCallback((e: React.MouseEvent, date: string) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setTooltipPos({ x: rect.left + rect.width / 2, y: rect.bottom + 8 });
+    setHoveredDate(date);
+  }, []);
 
   const handleMouseLeave = useCallback(() => {
     setHoveredDate(null);
@@ -605,7 +602,10 @@ export default function NotesPage({
             {viewMode === "list" ? (
               days.length === 0 ? (
                 <div className="flex-1 flex items-center justify-center px-6">
-                  <EmptyState variant="notes" />
+                  <EmptyState
+                    variant="notes"
+                    onAction={() => router.push("/")}
+                  />
                 </div>
               ) : (
                 <ScrollArea className="flex-1">
