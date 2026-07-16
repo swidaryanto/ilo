@@ -1,0 +1,21 @@
+src/app/notes/page-client.tsx
+  s_90706f681ebcc2::t_153f0b5dea2d14 395-399,605-608
+src/components/empty-state.tsx
+  s_90706f681ebcc2::t_a189f02d501c1c 41,48,51-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "f305ba06d36c2abcd6a8e16ad2d3c2cc49d5883b",
+  "prompts": {},
+  "sessions": {
+    "s_90706f681ebcc2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6b12-306a-7500-b88b-31c48690bbde",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Septian Widaryanto <septianwidaryanto@gmail.com>"
+    }
+  }
+}
